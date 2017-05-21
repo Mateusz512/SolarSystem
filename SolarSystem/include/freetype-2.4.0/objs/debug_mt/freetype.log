@@ -1,0 +1,84 @@
+﻿  autofit.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftbase.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftbbox.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftbitmap.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftfstype.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftgasp.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftglyph.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftgxval.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftinit.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftlcdfil.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftmm.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftotval.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftpatent.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftpfr.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftstroke.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftsynth.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftsystem.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  fttype1.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftwinfnt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftxf86.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  Generating Code...
+  Compiling...
+  bdf.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftcache.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  cff.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+c:\users\math\documents\visual studio 2015\projects\gk_lab_7\gk_lab_7\freetype-2.4.0\src\cff\cffgload.c(2683): warning C4244: '=': conversion from 'FT_UInt' to 'FT_Byte', possible loss of data
+  type1cid.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftgzip.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftlzw.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  pcf.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  pfr.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  psaux.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  pshinter.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  psmodule.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  raster.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  sfnt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  smooth.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  truetype.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  type1.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  type42.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  winfnt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  Generating Code...
+  ftdebug.c
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1357,5): warning MSB8012: TargetPath(C:\Users\Math\Documents\Visual Studio 2015\Projects\GK_Lab_7\GK_Lab_7\freetype-2.4.0\builds\win32\vc2008\.\..\..\..\objs\debug_mt\freetype.lib) does not match the Library's OutputFile property value (C:\Users\Math\Documents\Visual Studio 2015\Projects\GK_Lab_7\GK_Lab_7\freetype-2.4.0\objs\win32\vc2008\freetype240MT_D.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1359,5): warning MSB8012: TargetName(freetype) does not match the Library's OutputFile property value (freetype240MT_D). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+  freetype.vcxproj -> C:\Users\Math\Documents\Visual Studio 2015\Projects\GK_Lab_7\GK_Lab_7\freetype-2.4.0\builds\win32\vc2008\.\..\..\..\objs\debug_mt\freetype.lib
