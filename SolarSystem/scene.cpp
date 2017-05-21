@@ -77,7 +77,7 @@ void Scene::PrepareObjects()
 	plane->scale = 20;
 	moon = new glSphere(2, "textures\\moon.bmp", NULL, NULL, NULL);
 	moon->setPos(glm::vec3(0, 0, 4));
-	earth = new glSphere(2, "textures\\earthmap.jpg", NULL, NULL, NULL);
+	earth = new glSphere(2, "textures\\earthmap.jpg", "textures\\2k_earth_specular_map.png", NULL, NULL);
 	earth->setPos(glm::vec3(7, 0, 0));
 }
 //--------------------------------------------------------------------------------------------
@@ -454,7 +454,7 @@ void Scene::renderScene(Shader* shader) {
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 
-	shader->setInt("EnableDiffuseTexture", 1);
+	shader->setInt("EnableDiffuseTexture", 0);
 	shader->setInt("EnableSpecularTexture", 0);
 	shader->setInt("EnableNormalTexture", 0);
 	shader->setInt("EnableExtraTexture", 0);
@@ -468,22 +468,28 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	shader->setMat4("model", mTransform);
 	for (int i = 0; i < 4; i++) {
 		GLuint dummy = toDraw->getTextureID(i);
-		if (dummy == UINT_MAX)
-			continue;
+		if (dummy == UINT_MAX){
+
+			continue;		
+		}
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, dummy);
 		glEnable(GL_TEXTURE_2D);
 		switch (i) {
 		case Diffuse:
+			shader->setInt("EnableDiffuseTexture", 1);
 			shader->setInt("diffuseTexture", i);
 			break;
 		case Specular:
+			shader->setInt("EnableSpecularTexture", 1);
 			shader->setInt("specularTexture", i);
 			break;
 		case Normal:
+			shader->setInt("EnableNormalTexture", 1);
 			shader->setInt("normalTexture", i);
 			break;
 		case Extra:
+			shader->setInt("EnableExtraTexture", 1);
 			shader->setInt("extraTexture", i);
 			break;
 		}
