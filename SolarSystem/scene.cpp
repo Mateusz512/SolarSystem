@@ -75,9 +75,9 @@ void Scene::PrepareObjects()
 	plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.bmp", NULL, NULL, NULL);
 	plane->setPos(glm::vec3(0, -2.5, 0));
 	plane->scale = 20;
-	moon = new glSphere(2, "textures\\moon.bmp", NULL, NULL, NULL);
+	moon = new glSphere(2, "textures\\moon.bmp", NULL, NULL, NULL ,glm::vec3(0));
 	moon->setPos(glm::vec3(0, 0, 4));
-	earth = new glSphere(2, "textures\\earthmap.jpg", "textures\\2k_earth_specular_map.png", NULL, NULL);
+	earth = new glSphere(2, "textures\\earthmap.jpg", "textures\\2k_earth_specular_map.png", NULL, "textures\\cloudsmap.jpg",glm::vec3(1));
 	earth->setPos(glm::vec3(7, 0, 0));
 }
 //--------------------------------------------------------------------------------------------
@@ -194,6 +194,7 @@ void Scene::Init()
 	skyboxShader = new Shader("shaders\\skybox.vs", "shaders\\skybox.fs");
 
 	defaultShader->setInt("diffuseTexture", Diffuse);
+	defaultShader->setInt("isAtmo", 0);
 
 	// przygotuj obiekty do wyswietlenia 
 	PrepareObjects();
@@ -449,7 +450,7 @@ void Scene::renderScene(Shader* shader) {
 
 	TransformAndDraw(shader, moon);
 
-	TransformAndDraw(shader, earth);
+	DrawPlanet(shader, earth);
 }
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
@@ -499,5 +500,24 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	shader->setInt("depthMap", ShadowCube);
 	toDraw->Draw();
+}
+
+void Scene::DrawPlanet(Shader* shader, glSphere* planet) {
+	float initScale = planet->scale;
+	TransformAndDraw(shader, planet);
+	if (planet->hasAtmo) {
+		planet->scale = initScale + 0.25;
+		shader->setInt("isAtmo", 1);
+		shader->setVec3("atmoColor", *(planet->atmoColor));
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		TransformAndDraw(shader, planet);
+		glDisable(GL_BLEND);
+
+		shader->setInt("isAtmo", 0);
+		shader->setVec3("atmoColor", glm::vec3(0));
+		planet->scale = initScale;
+	}
 }
 //------------------------------- KONIEC PLIKU -----------------------------------------------

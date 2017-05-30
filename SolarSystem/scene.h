@@ -49,6 +49,9 @@ void renderScene(Shader * shader);
 
 void TransformAndDraw(Shader * shader, Drawable * toDraw);
 
+
+void DrawPlanet(Shader * shader, glSphere * planet);
+
 void Resize(int new_width, int new_height); // zmienia rozmiar sceny 
 
 void Init(); // procedura inicjujaca przetwarzanie

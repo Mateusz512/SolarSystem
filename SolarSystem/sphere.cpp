@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------------------------------------
 // domyslny konstruktor 
-glSphere::glSphere(float R, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) : Drawable()
+glSphere::glSphere(float R, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture, glm::vec3 atmoColor) : Drawable()
 {
 	if (diffuseTexture != NULL)
 		textures[Diffuse] = new glTexture(diffuseTexture);
@@ -12,6 +12,11 @@ glSphere::glSphere(float R, char* diffuseTexture, char* specularTexture, char* n
 		textures[Normal] = new glTexture(normalTexture);
 	if (extraTexture != NULL)
 		textures[Extra] = new glTexture(extraTexture);
+
+	if (atmoColor.r != 0 && atmoColor.g != 0 && atmoColor.b != 0) {
+		hasAtmo = true;
+		this->atmoColor = new glm::vec3(atmoColor);
+	}
 
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
@@ -102,7 +107,7 @@ void glSphere::Draw()
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 	//glUniform1i(TextureID, 0);gl.activeTexture(gl.TEXTURE0);
 	// 1rst attribute buffer : vertices
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(
@@ -148,6 +153,6 @@ void glSphere::Draw()
 		GL_UNSIGNED_SHORT,   // type
 		(void*)0           // element array buffer offset
 	);
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK);
 }
 // the end 
