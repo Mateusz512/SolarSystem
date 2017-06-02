@@ -67,7 +67,7 @@ void main()
 	vec3 color;
 	if( isAtmo == 1 ){
 		if( EnableExtraTexture == 1 ){
-			color = texture(extraTexture, 1.0f - fs_in.TexCoords).rgb;
+			color = texture(extraTexture, 1.0f - fs_in.TexCoords).rgb ;
 		}else{			
 			color = atmoColor;
 		}
@@ -91,7 +91,7 @@ void main()
 	vec3 specular;
 	vec3 halfwayDir = normalize(lightDir + viewDir);  
 	spec = pow(max(dot(normal, halfwayDir), 0.0), 8.0);
-	if( EnableSpecularTexture == 1 ){
+	if( isAtmo == 0 && EnableSpecularTexture == 1  ){
 		//FragColor = vec4(texture(specularTexture, 1.0f - fs_in.TexCoords).rgb, 1.0f);
 		specular = 3 *  spec * vec3(texture(specularTexture, 1.0f - fs_in.TexCoords));
 	}else{

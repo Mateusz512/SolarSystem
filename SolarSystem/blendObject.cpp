@@ -4,8 +4,14 @@ blendObject::blendObject()
 {
 }
 
-blendObject::blendObject(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) : Drawable()
+blendObject::blendObject(char* filename, 
+	char* diffuseTexture, 
+	char* specularTexture, 
+	char* normalTexture, 
+	char* extraTexture, 
+	int instancesCount) : Drawable()
 {
+	this->instancesCount = instancesCount;
 	Load(filename, diffuseTexture, specularTexture, normalTexture, extraTexture);
 }
 
@@ -21,57 +27,40 @@ void blendObject::Draw()
 	//glUniform1i(TextureID, 0);gl.activeTexture(gl.TEXTURE0);
 
 	// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(
-		0,                  // attribute
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
-	);
 
 	// 2nd attribute buffer : UVs
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glVertexAttribPointer(
-		1,                                // attribute
-		2,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-	);
 
 	// 3rd attribute buffer : normals
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-	glVertexAttribPointer(
-		2,                                // attribute
-		3,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-	);
 
 	// Index buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBindVertexArray(m_VAO);
 
-	// Draw the triangles !
-	glDrawElements(
-		GL_TRIANGLES,      // mode
-		size,    // count
-		GL_UNSIGNED_SHORT,   // type
-		(void*)0           // element array buffer offset
-	);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+	if (instancesCount > 0) {
+		glDrawElementsInstanced(GL_TRIANGLES,
+			size,
+			GL_UNSIGNED_SHORT,
+			(void*)(0),
+			instancesCount);
+	}
+	else {
+		glDrawElements(
+			GL_TRIANGLES,      // mode
+			size,    // count
+			GL_UNSIGNED_SHORT,   // type
+			(void*)0           // element array buffer offset
+		);		
+	}
+	glBindVertexArray(0);
 }
 
 
+
+
 void blendObject::Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) {
-	
-	if(diffuseTexture != NULL)
+
+	if (diffuseTexture != NULL)
 		textures[Diffuse] = new glTexture(diffuseTexture);
 	if (specularTexture != NULL)
 		textures[Specular] = new glTexture(specularTexture);
@@ -82,8 +71,11 @@ void blendObject::Load(char* filename, char* diffuseTexture, char* specularTextu
 
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
-	std::vector< glm::vec3 > normals; 
+	std::vector< glm::vec3 > normals;
 
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+	
 	ReadFromFile(filename, vertices, uvs, normals);
 
 	std::vector<unsigned short> indices;
@@ -96,23 +88,69 @@ void blendObject::Load(char* filename, char* diffuseTexture, char* specularTextu
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(
+		0,                  // attribute
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
 
 	uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(
+		1,                                // attribute
+		2,                                // size
+		GL_FLOAT,                         // type
+		GL_FALSE,                         // normalized?
+		0,                                // stride
+		(void*)0                          // array buffer offset
+	);
 
 	normalbuffer;
 	glGenBuffers(1, &normalbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
 	glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
-
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(
+		2,                                // attribute
+		3,                                // size
+		GL_FLOAT,                         // type
+		GL_FALSE,                         // normalized?
+		0,                                // stride
+		(void*)0                          // array buffer offset
+	);
+	
 	// Generate a buffer for the indices as well
 	elementbuffer;
 	glGenBuffers(1, &elementbuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 
+	if (instancesCount > 0) {
+		PrepareInstancesMatrices();
+
+		glGenBuffers(1, &modelMatricesBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
+
+		for (unsigned int i = 0; i < 4; i++) {
+			glEnableVertexAttribArray(3 + i);
+			glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
+				(const GLvoid*)(sizeof(GLfloat) * i * 4));
+			glVertexAttribDivisor(3 + i, 1);
+		}
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instancesCount, modelMatrices, GL_DYNAMIC_DRAW);		
+	}
+
+	glBindVertexArray(0);
 	size = indices.size();
 }
 
@@ -187,5 +225,36 @@ void blendObject::ReadFromFile(char * filename,
 		index = normalIndices[i];
 		glm::vec3 normal = temp_normals[index - 1];
 		out_normals.push_back(normal);
+	}
+}
+
+void blendObject::PrepareInstancesMatrices() {
+	modelMatrices = new glm::mat4[instancesCount];
+	srand(1337); // initialize random seed	
+	float radius = 15.0;
+	float offset = 5.0f;
+	for (unsigned int i = 0; i < instancesCount; i++)
+	{
+		glm::mat4 model;
+		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
+		float angle = (float)i / (float)instancesCount * 360.0f;
+		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = sin(angle) * radius + displacement;
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float z = cos(angle) * radius + displacement;
+		model = glm::translate(model, glm::vec3(x, y, z));
+
+		// 2. scale: Scale between 0.05 and 0.25f
+		float scale = (rand() % 20) / 100.0f + 0.05;
+		model = glm::scale(model, glm::vec3(scale));
+
+		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+		float rotAngle = (rand() % 360);
+		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+		// 4. now add to list of matrices
+		modelMatrices[i] = model;
 	}
 }

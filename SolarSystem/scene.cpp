@@ -75,10 +75,11 @@ void Scene::PrepareObjects()
 	plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.bmp", NULL, NULL, NULL);
 	plane->setPos(glm::vec3(0, -2.5, 0));
 	plane->scale = 20;
-	moon = new glSphere(2, "textures\\moon.bmp", NULL, NULL, NULL ,glm::vec3(0));
+	moon = new glSphere(2, "textures\\cloudsmap.bmp", NULL, NULL, NULL ,glm::vec3(0));
 	moon->setPos(glm::vec3(0, 0, 4));
-	earth = new glSphere(2, "textures\\earthmap.jpg", "textures\\2k_earth_specular_map.png", NULL, "textures\\cloudsmap.jpg",glm::vec3(1));
+	earth = new glSphere(2, "textures\\earthmap.jpg", "textures\\2k_earth_specular_map.png", NULL, "textures\\cloudsmap.bmp",glm::vec3(1));
 	earth->setPos(glm::vec3(7, 0, 0));
+	rock = new blendObject("objects\\rock.obj", "textures\\rock.png" , NULL, NULL, NULL, 3000);
 }
 //--------------------------------------------------------------------------------------------
 // Odpowiada za skalowanie sceny przy zmianach rozmiaru okna
@@ -223,14 +224,14 @@ void Scene::Init()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	defaultShader->setInt("depthMap", ShadowCube);
-
-	//glDrawBuffer(GL_FRONT);
-	//glReadBuffer(GL_FRONT);
-
+	
 	cameraPosition = glm::vec3(5, 0, 5);
 
 	skybox = new Skybox(skyboxShader);
+
+
 }
+
 //--------------------------------------------------------------------------------------------
 // przeprowadza animacje sceny 
 void Scene::Animate()
@@ -446,9 +447,11 @@ void Scene::renderScene(Shader* shader) {
 
 	TransformAndDraw(shader, plane);
 
-	TransformAndDraw(shader, test);
+	//TransformAndDraw(shader, test);
 
 	TransformAndDraw(shader, moon);
+
+	TransformAndDraw(shader, rock);
 
 	DrawPlanet(shader, earth);
 }
@@ -506,12 +509,13 @@ void Scene::DrawPlanet(Shader* shader, glSphere* planet) {
 	float initScale = planet->scale;
 	TransformAndDraw(shader, planet);
 	if (planet->hasAtmo) {
-		planet->scale = initScale + 0.25;
+		planet->scale = initScale + initScale*0.05;
 		shader->setInt("isAtmo", 1);
 		shader->setVec3("atmoColor", *(planet->atmoColor));
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquation(GL_FUNC_ADD);
 		TransformAndDraw(shader, planet);
 		glDisable(GL_BLEND);
 
@@ -519,5 +523,9 @@ void Scene::DrawPlanet(Shader* shader, glSphere* planet) {
 		shader->setVec3("atmoColor", glm::vec3(0));
 		planet->scale = initScale;
 	}
+}
+
+void Scene::DrawSaturnRing() {
+
 }
 //------------------------------- KONIEC PLIKU -----------------------------------------------

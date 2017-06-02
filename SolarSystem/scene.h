@@ -52,6 +52,8 @@ void TransformAndDraw(Shader * shader, Drawable * toDraw);
 
 void DrawPlanet(Shader * shader, glSphere * planet);
 
+void DrawSaturnRing();
+
 void Resize(int new_width, int new_height); // zmienia rozmiar sceny 
 
 void Init(); // procedura inicjujaca przetwarzanie
@@ -77,6 +79,8 @@ float movementSensitivity = 0.3;
 
 blendObject *test;
 blendObject *plane;
+
+blendObject *rock;
 
 glSphere* moon;
 glSphere* earth;
@@ -125,6 +129,8 @@ glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, 0, -1));
 
 glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);
+
+int rockAmount = 100000;
 
 };
 

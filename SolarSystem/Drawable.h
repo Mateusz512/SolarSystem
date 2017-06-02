@@ -35,6 +35,7 @@ public:
 		this->rotationMatrix = new glm::mat4(matrix);
 	}
 protected:
+	GLuint m_VAO;
 
 	glTexture** textures;
 	GLuint size;
@@ -42,4 +43,5 @@ protected:
 	GLuint uvbuffer;
 	GLuint normalbuffer;
 	GLuint elementbuffer;
+	GLuint modelMatrixBuffer;
 };
