@@ -25,6 +25,7 @@ uniform int EnableExtraTexture;
 uniform float far_plane;
 uniform int isAtmo;
 
+uniform int shadows;
 
 // array of offset direction for sampling
 vec3 gridSamplingDisk[20] = vec3[]
@@ -99,7 +100,12 @@ void main()
 		specular = spec * lightColor;
 	}
     // calculate shadow
-    float shadow = ShadowCalculation(fs_in.FragPos);                      
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
-    FragColor = vec4(lighting, 0.5f);
+	float shadow;
+	if(shadows == 1){
+		float shadow = ShadowCalculation(fs_in.FragPos); 	
+		vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
+		FragColor = vec4(lighting, 0.5f);
+	}else{
+		FragColor = vec4(color, 1);
+	}                     
 }

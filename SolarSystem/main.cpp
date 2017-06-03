@@ -264,7 +264,7 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 			if (currentX == cPos.x && currentY == cPos.y) {
 				SC->DrawPicking();
 				SC->LMBClicked(currentX, currentY);
-				SwapBuffers(hDC);			
+				//SwapBuffers(hDC);			
 			}			
 			return 0;
 		}

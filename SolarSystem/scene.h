@@ -144,7 +144,7 @@ glm::vec3 lightPos = glm::vec3(0,0,0);
 glm::vec3 cameraPosition = glm::vec3(5, 0, 5);
 Drawable* cameraParent;
 float cameraAngle = 45.0f;
-glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, 0, -1));
+glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, -0.1, -1));
 
 glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);

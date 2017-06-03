@@ -7,6 +7,21 @@ char* mergeTwoStrings(std::string one, std::string two) {
 	strcat(result, two.c_str());
 	return result;
 }
+
+glm::vec3 getGlobalPos(Drawable* obj) {
+	glm::vec3 Pos = glm::vec3(0);
+	std::vector<Drawable*> parents;
+	Drawable* parent = obj->parent;
+	while (parent != NULL) {
+		parents.push_back(parent);
+		parent = parent->parent;
+	}
+	for (int i = 0; i < parents.size(); i++) {
+		Pos += *parents[i]->position;
+	}
+	Pos += *obj->position;
+	return Pos;
+}
 Scene::Scene(int new_width, int new_height)
 {
 	width = new_width;
@@ -24,7 +39,7 @@ void Scene::PrepareObjects()
 {
 
 	celestrials = new glSphere*[celestrialsCount];
-	celestrials[Sun] = prepareCelestrial(3.0f, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02f);
+	celestrials[Sun] = prepareCelestrial(4.0f, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02f);
 	celestrials[1] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(10,0,0), 0.06f, 0.06f);
 	celestrials[2] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
 
@@ -146,6 +161,7 @@ void Scene::Init()
 
 	defaultShader->setInt("diffuseTexture", Diffuse);
 	defaultShader->setInt("isAtmo", 0);
+	defaultShader->setInt("shadows", 1);
 
 	// przygotuj obiekty do wyswietlenia 
 	PrepareObjects();
@@ -314,16 +330,7 @@ void Scene::DrawPicking() {
 	glClearColor(0, 0, 0, 1.0f);
 	pickingShader->use();
 
-	glm::vec3 eyePos = glm::vec3(0);
-	std::vector<Drawable*> parents;
-	Drawable* parent = cameraParent;
-	while (parent != NULL) {
-		parents.push_back(parent);
-		parent = parent->parent;
-	}
-	for (int i = 0; i < parents.size(); i++) {
-		eyePos += *parents[i]->position;
-	}
+	glm::vec3 eyePos = getGlobalPos(cameraParent);
 	eyePos += cameraPosition;
 
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
@@ -350,17 +357,8 @@ void Scene::Draw()
 	// ustaw macierz projekcji na perspektywiczna
 	defaultShader->use();
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-
-	glm::vec3 eyePos = glm::vec3(0);
-	std::vector<Drawable*> parents;
-	Drawable* parent = cameraParent;
-	while (parent != NULL) {
-		parents.push_back(parent);
-		parent = parent->parent;
-	}
-	for (int i = 0; i < parents.size(); i++) {
-		eyePos += *parents[i]->position;
-	}
+	
+	glm::vec3 eyePos = getGlobalPos(cameraParent);
 	eyePos += cameraPosition;
 
 	glm::mat4 view = glm::lookAt(eyePos,
@@ -371,7 +369,7 @@ void Scene::Draw()
 
 	// set lighting uniforms
 	defaultShader->setVec3("lightPos", lightPos);
-	defaultShader->setVec3("viewPos", cameraPosition);
+	defaultShader->setVec3("viewPos", eyePos);
 	defaultShader->setFloat("far_plane", far_plane);
 	
 	DrawSun(defaultShader);
@@ -418,6 +416,7 @@ void Scene::Draw()
 void Scene::DrawSun(Shader* shader) {
 
 	shader->use();
+	defaultShader->setInt("shadows", 0);
 	glm::mat4 mTransform = glm::mat4(1);
 	mTransform = (*celestrials[Sun]->rotationMatrix) * mTransform;
 	if (celestrials[Sun]->scale != 1.0f && celestrials[Sun]->scale>0)
@@ -433,6 +432,7 @@ void Scene::DrawSun(Shader* shader) {
 
 	shader->setInt("gObjectIndex", celestrials[Sun]->ID);
 	celestrials[Sun]->Draw();
+	defaultShader->setInt("shadows", 1);
 
 }
 
@@ -467,19 +467,12 @@ void Scene::renderShadowMaps() {
 
 void Scene::renderScene(Shader* shader) {
 
-
-	RenderDrawable(shader, plane);
-
-	//RenderDrawable(shader, test);
-
-	//RenderDrawable(shader, moon);
 	for (int i = 1; i < celestrialsCount; i++) {
 		RenderDrawable(shader, celestrials[i]);
 	}
 
 	RenderDrawable(shader, rock);
 
-	//RenderDrawable(shader, earth);
 }
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
@@ -560,55 +553,6 @@ void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
 	}
 }
 
-/*void Scene::PreparePickingBuffer() {
-	// Create the FBO
-	glBindFramebuffer(GL_FRAMEBUFFER, pickingFBO);
-
-	// Create the texture object for the primitive information buffer
-	glGenTextures(1, &pickingPrimitiveTexture);
-	glBindTexture(GL_TEXTURE_2D, pickingPrimitiveTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height,
-		0, GL_RGB, GL_FLOAT, NULL);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-		pickingPrimitiveTexture, 0);
-
-	// Create the texture object for the depth buffer
-	glBindTexture(GL_TEXTURE_2D, pickingDepthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height,
-		0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-		pickingDepthTexture, 0);
-
-	// Disable reading to avoid problems with older GPUs
-	glReadBuffer(GL_NONE);
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-	// Verify that the FBO is correct
-	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (Status != GL_FRAMEBUFFER_COMPLETE) {
-		printf("FB error, status: 0x%x\n", Status);
-	}
-
-	// Restore the default framebuffer
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-}
-
-void Scene::RenderPickingBuffer() {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pickingFBO);
-		
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glDisable(GL_BLEND);
-	renderScene(pickingShader);
-	
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}*/
-
 float Scene::readMouseClickObj(int x, int y) {
 
 	unsigned char Pixel[4];
@@ -618,16 +562,19 @@ float Scene::readMouseClickObj(int x, int y) {
 	glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &Pixel);
 	
 	if (Pixel[0] != 0) {
-		glSphere* clicked;
+		glSphere* clicked = NULL;
 		for (int i = 0; i < celestrialsCount; i++) {
 			if (celestrials[i]->ID == Pixel[0]) {
 				clicked = celestrials[i];
 				break;
 			}
 		}
+		if (!clicked) return 0;
+		glm::vec3 pos =	getGlobalPos(cameraParent);
 		cameraParent = clicked;
-		cameraPosition = glm::vec3(5, 2, 5);
-		cameraDirection = glm::normalize(glm::vec3(-1, -0.1f, -1));
+		glm::vec3 npos = getGlobalPos(clicked);
+		cameraPosition = pos + cameraPosition - npos;
+		//cameraDirection = glm::normalize(glm::vec3(-1, -0.1f, -1));
 		return Pixel[0];
 	}
 	return Pixel[0];
