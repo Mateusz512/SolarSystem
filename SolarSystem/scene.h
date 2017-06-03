@@ -43,7 +43,9 @@ Scene(int new_width,int new_height); //  domyslny konstruktor
 
 void Draw(); // rysuje zawartosc sceny
 
-void DrawSun();
+void DrawPicking();
+
+void DrawSun(Shader* shader);
 
 void renderShadowMaps();
 
@@ -52,6 +54,12 @@ void renderScene(Shader * shader);
 void TransformAndDraw(Shader * shader, Drawable * toDraw);
 
 void RenderDrawable(Shader* shader, Drawable* toDraw);
+
+/*void PreparePickingBuffer();
+
+void RenderPickingBuffer();*/
+
+float readMouseClickObj(int x, int y);
 
 void Resize(int new_width, int new_height); // zmienia rozmiar sceny 
 
@@ -63,6 +71,7 @@ void KeyPressed(unsigned char key, int x, int y); // obsluga klawiatury
 
 void MouseMoved(int x, int y,bool dragged);
 void MouseRolled(int dir);
+void LMBClicked(int x, int y);
 bool isFirstMouseMovement = true;
 
 void SaveAsBmp(char *filename);
@@ -70,6 +79,8 @@ void SaveAsBmp(char *filename);
 //GLuint LoadShader(GLenum type,const char *file_name); // laduje program shadera z zewnetrznego pliku 
 
 private:
+
+bool glewOK = false;
 
 float LightAmbient;
 
@@ -118,6 +129,7 @@ int err;
 Shader* defaultShader;
 Shader* depthShader;
 Shader* skyboxShader;
+Shader* pickingShader;
 
 Skybox* skybox;
 
@@ -130,17 +142,19 @@ float far_plane = 400.0f;
 
 glm::vec3 lightPos = glm::vec3(0,0,0);
 glm::vec3 cameraPosition = glm::vec3(5, 0, 5);
+Drawable* cameraParent;
 float cameraAngle = 45.0f;
 glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, 0, -1));
 
 glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);
 
-int rockAmount = 100000;
-
 float orbitFactor = 2;
 float rotFactor = 1;
 
+/*GLuint pickingFBO;
+GLuint pickingPrimitiveTexture;
+GLuint pickingDepthTexture;*/
 };
 
 #endif

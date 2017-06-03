@@ -10,4 +10,7 @@
 bool isDragging = false;
 bool hasLeft = false;
 
+float currentX;
+float currentY;
+
 

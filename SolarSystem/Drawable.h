@@ -4,7 +4,10 @@
 
 class Drawable {
 public:
+	static int Drawable::globalID;
+	int ID;
 	Drawable() {
+		ID = Drawable::globalID++;
 		position = new glm::vec3(0, 0, 0);
 		rotationMatrix = new glm::mat4(1);
 		scale = 1.0f;

@@ -232,7 +232,7 @@ void blendObject::PrepareInstancesMatrices() {
 	srand(1337); // initialize random seed	
 	float radius = 15.0;
 	float offset = 5.0f;
-	for (unsigned int i = 0; i < instancesCount; i++)
+	for (int i = 0; i < instancesCount; i++)
 	{
 		glm::mat4 model;
 		// 1. translation: displace along circle with 'radius' in range [-offset, offset]

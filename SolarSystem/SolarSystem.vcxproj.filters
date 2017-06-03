@@ -90,6 +90,9 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\defaultFS.fs">
@@ -111,6 +114,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\skybox.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\pickingFS.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\pickingVS.vs">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

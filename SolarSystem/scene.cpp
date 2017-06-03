@@ -22,22 +22,16 @@ Scene::~Scene()
 //--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-	//test = new blendObject("objects\\Cube.obj", "textures\\moon.jpg" , NULL, NULL, NULL);
-	//plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.jpg", NULL, NULL, NULL);
-	//plane->position = new glm::vec3(0, -2.5, 0);
-	//plane->scale = 20;
 
 	celestrials = new glSphere*[celestrialsCount];
-	celestrials[0] = prepareCelestrial(3, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02);
-	celestrials[1] = prepareCelestrial(1, "earth", glm::vec3(1), celestrials[0], glm::vec3(10,0,0), 0.06, 0.06);
-	celestrials[2] = prepareCelestrial(0.5, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2, 0.1);
-	/*moon = new glSphere(2, "textures\\moon.jpg", NULL, NULL, NULL ,glm::vec3(0));
-	moon->position = new glm::vec3(0, 0, 4);
-	earth = new glSphere(2, "textures\\earth_diff.jpg", "textures\\earth_spec.jpg", NULL, "textures\\earth_extra.jpg",glm::vec3(1));
-	earth->position = new glm::vec3(7, 0, 0);*/
+	celestrials[Sun] = prepareCelestrial(3.0f, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02f);
+	celestrials[1] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(10,0,0), 0.06f, 0.06f);
+	celestrials[2] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
 
 	rock = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 3000);
 	rock->position = new glm::vec3(0, 10, 0);
+
+	cameraParent = celestrials[Sun];
 }
 
 glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoColor, Drawable* parent, glm::vec3 pos, float orbitSpeed, float rotSpeed) {	
@@ -135,7 +129,8 @@ void Scene::Init()
 {
 	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
+	glewOK = err == GLEW_OK;
+	if (!glewOK)
 	{
 		sprintf(_msg, "GLew error: %s\n", glewGetErrorString(err));
 		err = 1;
@@ -147,6 +142,7 @@ void Scene::Init()
 	defaultShader = new Shader("shaders\\defaultVS.vs", "shaders\\defaultFS.fs");
 	depthShader = new Shader("shaders\\depthShader.vs", "shaders\\depthShader.fs", "shaders\\depthShader.gs");
 	skyboxShader = new Shader("shaders\\skybox.vs", "shaders\\skybox.fs");
+	pickingShader = new Shader("shaders\\pickingVS.vs", "shaders\\pickingFS.fs");
 
 	defaultShader->setInt("diffuseTexture", Diffuse);
 	defaultShader->setInt("isAtmo", 0);
@@ -156,6 +152,9 @@ void Scene::Init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	/*glGenFramebuffers(1, &pickingFBO);
+	glGenTextures(1, &pickingDepthTexture);
+	PreparePickingBuffer();*/
 
 	// configure depth map FBO
 	// -----------------------
@@ -246,6 +245,10 @@ void Scene::MouseRolled(int dir) {
 	else if (dir < 0 && cameraAngle < 155)
 		cameraAngle += 5;
 }
+
+void Scene::LMBClicked(int x, int y) {
+	float dummy = readMouseClickObj(x, y);
+}
 //--------------------------------------------------------------------------------------------
 void Scene::SaveAsBmp(char *filename)
 {
@@ -306,29 +309,72 @@ void Scene::SaveAsBmp(char *filename)
 }
 //--------------------------------------------------------------------------------------------
 // rysuje scene OpenGL 
+void Scene::DrawPicking() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0, 0, 0, 1.0f);
+	pickingShader->use();
+
+	glm::vec3 eyePos = glm::vec3(0);
+	std::vector<Drawable*> parents;
+	Drawable* parent = cameraParent;
+	while (parent != NULL) {
+		parents.push_back(parent);
+		parent = parent->parent;
+	}
+	for (int i = 0; i < parents.size(); i++) {
+		eyePos += *parents[i]->position;
+	}
+	eyePos += cameraPosition;
+
+	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
+	glm::mat4 view = glm::lookAt(eyePos,
+		eyePos + cameraDirection,
+		glm::vec3(0.0f, 1.0f, 0.0f));
+	pickingShader->setMat4("projection", projection);
+	pickingShader->setMat4("view", view);
+
+	DrawSun(pickingShader);
+	renderScene(pickingShader);
+}
+
 void Scene::Draw()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0, 0, 0, 1.0f);
 	if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
 
 	//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	renderShadowMaps();
+	
 
 	// ustaw macierz projekcji na perspektywiczna
 	defaultShader->use();
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-	glm::mat4 view = glm::lookAt(cameraPosition,
-		cameraPosition + cameraDirection,
+
+	glm::vec3 eyePos = glm::vec3(0);
+	std::vector<Drawable*> parents;
+	Drawable* parent = cameraParent;
+	while (parent != NULL) {
+		parents.push_back(parent);
+		parent = parent->parent;
+	}
+	for (int i = 0; i < parents.size(); i++) {
+		eyePos += *parents[i]->position;
+	}
+	eyePos += cameraPosition;
+
+	glm::mat4 view = glm::lookAt(eyePos,
+		eyePos + cameraDirection,
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	defaultShader->setMat4("projection", projection);
 	defaultShader->setMat4("view", view);
+
 	// set lighting uniforms
 	defaultShader->setVec3("lightPos", lightPos);
 	defaultShader->setVec3("viewPos", cameraPosition);
 	defaultShader->setFloat("far_plane", far_plane);
-	/*glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);*/
-	DrawSun();
-
+	
+	DrawSun(defaultShader);
 	renderScene(defaultShader);
 
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
@@ -369,22 +415,24 @@ void Scene::Draw()
 	glDisable(GL_BLEND);*/
 }
 
-void Scene::DrawSun() {
+void Scene::DrawSun(Shader* shader) {
 
+	shader->use();
 	glm::mat4 mTransform = glm::mat4(1);
-	mTransform = (*celestrials[0]->rotationMatrix) * mTransform;
-	if (celestrials[0]->scale != 1.0f && celestrials[0]->scale>0)
-		mTransform = glm::scale(mTransform, celestrials[0]->scale, celestrials[0]->scale, celestrials[0]->scale);
-	defaultShader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
-	defaultShader->setMat4("model", mTransform);
+	mTransform = (*celestrials[Sun]->rotationMatrix) * mTransform;
+	if (celestrials[Sun]->scale != 1.0f && celestrials[Sun]->scale>0)
+		mTransform = glm::scale(mTransform, celestrials[Sun]->scale, celestrials[Sun]->scale, celestrials[Sun]->scale);
+	shader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
+	shader->setMat4("model", mTransform);
 
 	glActiveTexture(GL_TEXTURE0 + Diffuse);
-	glBindTexture(GL_TEXTURE_2D, celestrials[0]->getTextureID(Diffuse));
+	glBindTexture(GL_TEXTURE_2D, celestrials[Sun]->getTextureID(Diffuse));
 	glEnable(GL_TEXTURE_2D);
-	defaultShader->setInt("EnableDiffuseTexture", 1);
-	defaultShader->setInt("diffuseTexture", Diffuse);
+	shader->setInt("EnableDiffuseTexture", 1);
+	shader->setInt("diffuseTexture", Diffuse);
 
-	celestrials[0]->Draw();
+	shader->setInt("gObjectIndex", celestrials[Sun]->ID);
+	celestrials[Sun]->Draw();
 
 }
 
@@ -420,7 +468,7 @@ void Scene::renderShadowMaps() {
 void Scene::renderScene(Shader* shader) {
 
 
-	//RenderDrawable(shader, plane);
+	RenderDrawable(shader, plane);
 
 	//RenderDrawable(shader, test);
 
@@ -436,6 +484,7 @@ void Scene::renderScene(Shader* shader) {
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 
+	shader->use();
 	shader->setInt("EnableDiffuseTexture", 0);
 	shader->setInt("EnableSpecularTexture", 0);
 	shader->setInt("EnableNormalTexture", 0);
@@ -456,7 +505,6 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	for (int i = 0; i < 4; i++) {
 		GLuint dummy = toDraw->getTextureID(i);
 		if (dummy == UINT_MAX){
-
 			continue;		
 		}
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -485,6 +533,7 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	shader->setInt("depthMap", ShadowCube);
+	shader->setInt("gObjectIndex", toDraw->ID);
 	toDraw->Draw();
 
 }
@@ -494,7 +543,7 @@ void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
 	if (glSphere* planet = dynamic_cast<glSphere*>(toDraw)) {
 		float initScale = planet->scale;
 		if (planet->hasAtmo) {
-			planet->scale = initScale + initScale*0.05;
+			planet->scale = initScale + initScale*0.05f;
 			shader->setInt("isAtmo", 1);
 			shader->setVec3("atmoColor", *(planet->atmoColor));
 
@@ -511,4 +560,76 @@ void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
 	}
 }
 
+/*void Scene::PreparePickingBuffer() {
+	// Create the FBO
+	glBindFramebuffer(GL_FRAMEBUFFER, pickingFBO);
+
+	// Create the texture object for the primitive information buffer
+	glGenTextures(1, &pickingPrimitiveTexture);
+	glBindTexture(GL_TEXTURE_2D, pickingPrimitiveTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height,
+		0, GL_RGB, GL_FLOAT, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+		pickingPrimitiveTexture, 0);
+
+	// Create the texture object for the depth buffer
+	glBindTexture(GL_TEXTURE_2D, pickingDepthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height,
+		0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+		pickingDepthTexture, 0);
+
+	// Disable reading to avoid problems with older GPUs
+	glReadBuffer(GL_NONE);
+
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	// Verify that the FBO is correct
+	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+	if (Status != GL_FRAMEBUFFER_COMPLETE) {
+		printf("FB error, status: 0x%x\n", Status);
+	}
+
+	// Restore the default framebuffer
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
+void Scene::RenderPickingBuffer() {
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pickingFBO);
+		
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glDisable(GL_BLEND);
+	renderScene(pickingShader);
+	
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}*/
+
+float Scene::readMouseClickObj(int x, int y) {
+
+	unsigned char Pixel[4];
+	GLint viewport[4];
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &Pixel);
+	
+	if (Pixel[0] != 0) {
+		glSphere* clicked;
+		for (int i = 0; i < celestrialsCount; i++) {
+			if (celestrials[i]->ID == Pixel[0]) {
+				clicked = celestrials[i];
+				break;
+			}
+		}
+		cameraParent = clicked;
+		cameraPosition = glm::vec3(5, 2, 5);
+		cameraDirection = glm::normalize(glm::vec3(-1, -0.1f, -1));
+		return Pixel[0];
+	}
+	return Pixel[0];
+}
 //------------------------------- KONIEC PLIKU -----------------------------------------------

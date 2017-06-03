@@ -251,11 +251,21 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 		case WM_LBUTTONDOWN:
 		{
 			isDragging = true;
+			POINT cPos;
+			GetCursorPos(&cPos);
+			currentX = cPos.x; currentY = cPos.y;
 			return 0;
 		}
 		case WM_LBUTTONUP:
 		{
 			isDragging = false;
+			POINT cPos;
+			GetCursorPos(&cPos);
+			if (currentX == cPos.x && currentY == cPos.y) {
+				SC->DrawPicking();
+				SC->LMBClicked(currentX, currentY);
+				SwapBuffers(hDC);			
+			}			
 			return 0;
 		}
 		case WM_MOUSEWHEEL: {
