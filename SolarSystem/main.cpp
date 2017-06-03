@@ -202,10 +202,9 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 
 		case WM_TIMER: // zdarzenie timera
 		{
-		/*	SC->Animate();
+			SC->Animate();
 			SC->Draw();
-			SwapBuffers(hDC);
-			*/
+			SwapBuffers(hDC);			
 			break;
 		}
 

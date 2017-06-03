@@ -20,19 +20,18 @@ public:
 		return UINT_MAX;
 	}
 
-
+	Drawable* parent;
 	glm::vec3* position;
+	float orbitSpeed;
+	float rotSpeed;
 	glm::mat4* rotationMatrix;
 	float scale = 1.0f;
-
-	void setPos(glm::vec3 & pos)
-	{
+		
+	void setOrbitInfo(Drawable* parent, glm::vec3 pos, float orbitSpeed, float rotSpeed) {
+		this->parent = parent;
+		this->orbitSpeed = orbitSpeed;
+		this->rotSpeed = rotSpeed; 
 		this->position = new glm::vec3(pos);
-	}
-
-	void setRotationMatrix(glm::mat4 & matrix)
-	{
-		this->rotationMatrix = new glm::mat4(matrix);
 	}
 protected:
 	GLuint m_VAO;

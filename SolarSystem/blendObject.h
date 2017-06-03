@@ -8,6 +8,7 @@
 #include <sstream>
 #include "glm\glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <filesystem>
 
 #define INDEX_BUFFER 0    
 #define POS_VB       1

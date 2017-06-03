@@ -60,15 +60,14 @@ void blendObject::Draw()
 
 void blendObject::Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) {
 
-	if (diffuseTexture != NULL)
+	if (diffuseTexture != NULL && std::experimental::filesystem::exists(diffuseTexture))
 		textures[Diffuse] = new glTexture(diffuseTexture);
-	if (specularTexture != NULL)
+	if (specularTexture != NULL && std::experimental::filesystem::exists(specularTexture))
 		textures[Specular] = new glTexture(specularTexture);
-	if (normalTexture != NULL)
+	if (normalTexture != NULL && std::experimental::filesystem::exists(normalTexture))
 		textures[Normal] = new glTexture(normalTexture);
-	if (extraTexture != NULL)
+	if (extraTexture != NULL && std::experimental::filesystem::exists(extraTexture))
 		textures[Extra] = new glTexture(extraTexture);
-
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;

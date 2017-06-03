@@ -1,5 +1,12 @@
 #include "scene.h"
 
+char* mergeTwoStrings(std::string one, std::string two) {
+	const int len = one.length() + two.length();
+	char* result = new char[len];
+	strcpy(result, one.c_str());
+	strcat(result, two.c_str());
+	return result;
+}
 Scene::Scene(int new_width, int new_height)
 {
 	width = new_width;
@@ -13,74 +20,37 @@ Scene::~Scene()
 	delete depthShader;
 }
 //--------------------------------------------------------------------------------------------
-// przygotowuje programy cienionwania 
-/*void Scene::PreparePrograms()
-{
-	err = 0; // ustaw flage bledu
-	program  = glCreateProgram();
-	if (!glIsProgram(program)) {err = 1; ThrowException("Nie udalo sie utworzyc programu");}
-
-	vertex_shader = LoadShader(GL_VERTEX_SHADER,"vs.glsl");
-	glAttachShader(program,vertex_shader);
-
-	fragment_shader = LoadShader(GL_FRAGMENT_SHADER,"fs.glsl");
-	glAttachShader(program,fragment_shader);
-
-	// linkowanie programu
-	glLinkProgram(program);
-
-	GLint link_status;
-	glGetProgramiv( program, GL_LINK_STATUS, &link_status);
-	if( link_status == GL_FALSE )
-	{
-		// pobranie i wyœwietlenie komunikatu b³êdu
-		GLint logLength;
-		glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logLength );
-		char *log = new char[logLength];
-		glGetProgramInfoLog( program, logLength, NULL, log );
-		PrintLog(log);
-		delete[] log;
-		err = 1;
-		ThrowException("Blad linkowania programu");
-	}
-	else
-		PrintLog("Program zlinkowany");
-
-	// walidowanie programu
-	glValidateProgram(program);
-	GLint validate_status;
-	// sprawdzenie poprawnoœci walidacji obiektu programu
-	glGetProgramiv( program, GL_VALIDATE_STATUS, &validate_status );
-	if( validate_status == GL_FALSE )
-	{
-		// pobranie i wyœwietlenie komunikatu b³êdu
-		GLint logLength;
-		glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logLength );
-		char *log = new char[logLength];
-		glGetProgramInfoLog( program, logLength, NULL, log );
-		PrintLog(log);
-		delete[] log;
-		err = 1;
-		ThrowException("Blad walidacji programu");
-	}
-	else
-		PrintLog("Program prawidlowy");
-
-	glUseProgram(program);
-}*/
-//--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-	test = new blendObject("objects\\Cube.obj", "textures\\moon.bmp" , NULL, NULL, NULL);
-	plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.bmp", NULL, NULL, NULL);
-	plane->setPos(glm::vec3(0, -2.5, 0));
+	test = new blendObject("objects\\Cube.obj", "textures\\moon.jpg" , NULL, NULL, NULL);
+	plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.jpg", NULL, NULL, NULL);
+	plane->position = new glm::vec3(0, -2.5, 0);
 	plane->scale = 20;
-	moon = new glSphere(2, "textures\\cloudsmap.bmp", NULL, NULL, NULL ,glm::vec3(0));
-	moon->setPos(glm::vec3(0, 0, 4));
-	earth = new glSphere(2, "textures\\earthmap.jpg", "textures\\2k_earth_specular_map.png", NULL, "textures\\cloudsmap.bmp",glm::vec3(1));
-	earth->setPos(glm::vec3(7, 0, 0));
-	rock = new blendObject("objects\\rock.obj", "textures\\rock.png" , NULL, NULL, NULL, 3000);
+
+	celestrials = new glSphere*[celestrialsCount];
+	celestrials[0] = prepareCelestrial(3, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02);
+	celestrials[1] = prepareCelestrial(1, "earth", glm::vec3(1), celestrials[0], glm::vec3(10,0,0), 0.06, 0.06);
+	celestrials[2] = prepareCelestrial(0.5, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.1, 0.1);
+	/*moon = new glSphere(2, "textures\\moon.jpg", NULL, NULL, NULL ,glm::vec3(0));
+	moon->position = new glm::vec3(0, 0, 4);
+	earth = new glSphere(2, "textures\\earth_diff.jpg", "textures\\earth_spec.jpg", NULL, "textures\\earth_extra.jpg",glm::vec3(1));
+	earth->position = new glm::vec3(7, 0, 0);*/
+
+	rock = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 3000);
+	rock->position = new glm::vec3(0, 10, 0);
 }
+
+glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoColor, Drawable* parent, glm::vec3 pos, float orbitSpeed, float rotSpeed) {	
+	glSphere* sphere = new glSphere(size, 
+		mergeTwoStrings(TEX_LOCATION, name + "_diff.jpg"),
+		mergeTwoStrings(TEX_LOCATION, name + "_spec.jpg"),
+		mergeTwoStrings(TEX_LOCATION, name + "_normal.jpg"),
+		mergeTwoStrings(TEX_LOCATION, name + "_extra.jpg"),
+		atmoColor);
+	sphere->setOrbitInfo(parent, pos, orbitSpeed, rotSpeed);
+	return sphere;
+}
+
 //--------------------------------------------------------------------------------------------
 // Odpowiada za skalowanie sceny przy zmianach rozmiaru okna
 void Scene::Resize(int new_width, int new_height)
@@ -225,8 +195,6 @@ void Scene::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	defaultShader->setInt("depthMap", ShadowCube);
 	
-	cameraPosition = glm::vec3(5, 0, 5);
-
 	skybox = new Skybox(skyboxShader);
 
 
@@ -236,7 +204,9 @@ void Scene::Init()
 // przeprowadza animacje sceny 
 void Scene::Animate()
 {
-
+	for (int i = 0; i < celestrialsCount; i++) {
+		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), celestrials[i]->orbitSpeed*orbitFactor, glm::vec3(0, 1, 0));
+	}
 }
 //--------------------------------------------------------------------------------------------
 // kontrola naciskania klawiszy klawiatury
@@ -373,6 +343,14 @@ void Scene::Draw()
 	/*glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);*/
 
+	glm::mat4 mTransform = glm::mat4(1);
+	mTransform = (*celestrials[0]->rotationMatrix) * mTransform;
+	if (celestrials[0]->scale != 1.0f && celestrials[0]->scale>0)
+		mTransform = glm::scale(mTransform, celestrials[0]->scale, celestrials[0]->scale, celestrials[0]->scale);
+	defaultShader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
+	defaultShader->setMat4("model", mTransform);
+	celestrials[0]->Draw();
+
 	renderScene(defaultShader);
 
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
@@ -445,15 +423,18 @@ void Scene::renderShadowMaps() {
 void Scene::renderScene(Shader* shader) {
 
 
-	TransformAndDraw(shader, plane);
+	//RenderDrawable(shader, plane);
 
-	//TransformAndDraw(shader, test);
+	//RenderDrawable(shader, test);
 
-	TransformAndDraw(shader, moon);
+	//RenderDrawable(shader, moon);
+	for (int i = 1; i < celestrialsCount; i++) {
+		RenderDrawable(shader, celestrials[i]);
+	}
 
-	TransformAndDraw(shader, rock);
+	RenderDrawable(shader, rock);
 
-	DrawPlanet(shader, earth);
+	//RenderDrawable(shader, earth);
 }
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
@@ -464,6 +445,11 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	shader->setInt("EnableExtraTexture", 0);
 
 	glm::mat4 mTransform=glm::mat4(1);
+	Drawable* parent = toDraw->parent;
+	while (parent != NULL) {
+		mTransform = glm::translate(mTransform, (glm::vec3)(*parent->position));
+		parent = parent->parent;
+	}
 	mTransform = glm::translate(mTransform, (glm::vec3)(*toDraw->position));
 	mTransform = (*toDraw->rotationMatrix) * mTransform;
 	if (toDraw->scale != 1.0f && toDraw->scale>0)
@@ -503,29 +489,29 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	shader->setInt("depthMap", ShadowCube);
 	toDraw->Draw();
+
 }
 
-void Scene::DrawPlanet(Shader* shader, glSphere* planet) {
-	float initScale = planet->scale;
-	TransformAndDraw(shader, planet);
-	if (planet->hasAtmo) {
-		planet->scale = initScale + initScale*0.05;
-		shader->setInt("isAtmo", 1);
-		shader->setVec3("atmoColor", *(planet->atmoColor));
+void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
+	TransformAndDraw(shader, toDraw);
+	if (glSphere* planet = dynamic_cast<glSphere*>(toDraw)) {
+		float initScale = planet->scale;
+		if (planet->hasAtmo) {
+			planet->scale = initScale + initScale*0.05;
+			shader->setInt("isAtmo", 1);
+			shader->setVec3("atmoColor", *(planet->atmoColor));
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBlendEquation(GL_FUNC_ADD);
-		TransformAndDraw(shader, planet);
-		glDisable(GL_BLEND);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBlendEquation(GL_FUNC_ADD);
+			TransformAndDraw(shader, planet);
+			glDisable(GL_BLEND);
 
-		shader->setInt("isAtmo", 0);
-		shader->setVec3("atmoColor", glm::vec3(0));
-		planet->scale = initScale;
+			shader->setInt("isAtmo", 0);
+			shader->setVec3("atmoColor", glm::vec3(0));
+			planet->scale = initScale;
+		}
 	}
 }
 
-void Scene::DrawSaturnRing() {
-
-}
 //------------------------------- KONIEC PLIKU -----------------------------------------------

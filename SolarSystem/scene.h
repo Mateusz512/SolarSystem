@@ -49,10 +49,7 @@ void renderScene(Shader * shader);
 
 void TransformAndDraw(Shader * shader, Drawable * toDraw);
 
-
-void DrawPlanet(Shader * shader, glSphere * planet);
-
-void DrawSaturnRing();
+void RenderDrawable(Shader* shader, Drawable* toDraw);
 
 void Resize(int new_width, int new_height); // zmienia rozmiar sceny 
 
@@ -82,8 +79,15 @@ blendObject *plane;
 
 blendObject *rock;
 
-glSphere* moon;
-glSphere* earth;
+//glSphere* moon;
+//glSphere* earth;
+
+glSphere** celestrials;
+unsigned const short celestrialsCount = 3;
+glSphere* prepareCelestrial(float size, std::string name, 
+	glm::vec3 atmoColor, 
+	Drawable* parent, 
+	glm::vec3 pos, float orbitSpeed, float rotSpeed);
 
 glPrinter *Prn;
 
@@ -122,8 +126,8 @@ unsigned int depthMapFBO;
 float near_plane = 0.1f;
 float far_plane = 400.0f;
 
-glm::vec3 lightPos = glm::vec3(0,3,0);
-glm::vec3 cameraPosition = glm::vec3(0, 0, 0);
+glm::vec3 lightPos = glm::vec3(0,0,0);
+glm::vec3 cameraPosition = glm::vec3(5, 0, 5);
 float cameraAngle = 45.0f;
 glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, 0, -1));
 
@@ -131,6 +135,9 @@ glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);
 
 int rockAmount = 100000;
+
+float orbitFactor = 2;
+float rotFactor = 1;
 
 };
 
