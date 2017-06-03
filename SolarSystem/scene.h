@@ -43,6 +43,8 @@ Scene(int new_width,int new_height); //  domyslny konstruktor
 
 void Draw(); // rysuje zawartosc sceny
 
+void DrawSun();
+
 void renderShadowMaps();
 
 void renderScene(Shader * shader);

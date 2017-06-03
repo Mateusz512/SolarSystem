@@ -22,15 +22,15 @@ Scene::~Scene()
 //--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-	test = new blendObject("objects\\Cube.obj", "textures\\moon.jpg" , NULL, NULL, NULL);
-	plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.jpg", NULL, NULL, NULL);
-	plane->position = new glm::vec3(0, -2.5, 0);
-	plane->scale = 20;
+	//test = new blendObject("objects\\Cube.obj", "textures\\moon.jpg" , NULL, NULL, NULL);
+	//plane = new blendObject("objects\\Deseczka.obj", "textures\\moon.jpg", NULL, NULL, NULL);
+	//plane->position = new glm::vec3(0, -2.5, 0);
+	//plane->scale = 20;
 
 	celestrials = new glSphere*[celestrialsCount];
 	celestrials[0] = prepareCelestrial(3, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02);
 	celestrials[1] = prepareCelestrial(1, "earth", glm::vec3(1), celestrials[0], glm::vec3(10,0,0), 0.06, 0.06);
-	celestrials[2] = prepareCelestrial(0.5, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.1, 0.1);
+	celestrials[2] = prepareCelestrial(0.5, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2, 0.1);
 	/*moon = new glSphere(2, "textures\\moon.jpg", NULL, NULL, NULL ,glm::vec3(0));
 	moon->position = new glm::vec3(0, 0, 4);
 	earth = new glSphere(2, "textures\\earth_diff.jpg", "textures\\earth_spec.jpg", NULL, "textures\\earth_extra.jpg",glm::vec3(1));
@@ -142,22 +142,6 @@ void Scene::Init()
 		ThrowException(_msg);
 	}
 
-	// pobierz informacje o wersji openGL 
-	/*sprintf(_msg,"OpenGL vendor: ");
-	strcat(_msg,(const char*)glGetString( GL_VENDOR ));
-	PrintLog(_msg);
-
-	sprintf(_msg,"OpenGL renderer: ");
-	strcat(_msg,(const char*)glGetString( GL_RENDERER));
-	PrintLog(_msg);
-
-	sprintf(_msg,"OpenGL version: ");
-	strcat(_msg,(const char*)glGetString( GL_VERSION));
-	PrintLog(_msg);*/
-
-	//  ustaw kolor tla sceny (RGB Z=1.0)
-	glClearColor(0, 0, 0, 0.0f);
-
 	// przygotuj programy shaderow
 	//PreparePrograms();
 	defaultShader = new Shader("shaders\\defaultVS.vs", "shaders\\defaultFS.fs");
@@ -206,6 +190,7 @@ void Scene::Animate()
 {
 	for (int i = 0; i < celestrialsCount; i++) {
 		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), celestrials[i]->orbitSpeed*orbitFactor, glm::vec3(0, 1, 0));
+		*(celestrials[i]->rotationMatrix) = glm::rotate(*(celestrials[i]->rotationMatrix), celestrials[i]->rotSpeed*rotFactor, glm::vec3(0, 1, 0));
 	}
 }
 //--------------------------------------------------------------------------------------------
@@ -342,14 +327,7 @@ void Scene::Draw()
 	defaultShader->setFloat("far_plane", far_plane);
 	/*glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);*/
-
-	glm::mat4 mTransform = glm::mat4(1);
-	mTransform = (*celestrials[0]->rotationMatrix) * mTransform;
-	if (celestrials[0]->scale != 1.0f && celestrials[0]->scale>0)
-		mTransform = glm::scale(mTransform, celestrials[0]->scale, celestrials[0]->scale, celestrials[0]->scale);
-	defaultShader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
-	defaultShader->setMat4("model", mTransform);
-	celestrials[0]->Draw();
+	DrawSun();
 
 	renderScene(defaultShader);
 
@@ -389,6 +367,25 @@ void Scene::Draw()
 	}
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);*/
+}
+
+void Scene::DrawSun() {
+
+	glm::mat4 mTransform = glm::mat4(1);
+	mTransform = (*celestrials[0]->rotationMatrix) * mTransform;
+	if (celestrials[0]->scale != 1.0f && celestrials[0]->scale>0)
+		mTransform = glm::scale(mTransform, celestrials[0]->scale, celestrials[0]->scale, celestrials[0]->scale);
+	defaultShader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
+	defaultShader->setMat4("model", mTransform);
+
+	glActiveTexture(GL_TEXTURE0 + Diffuse);
+	glBindTexture(GL_TEXTURE_2D, celestrials[0]->getTextureID(Diffuse));
+	glEnable(GL_TEXTURE_2D);
+	defaultShader->setInt("EnableDiffuseTexture", 1);
+	defaultShader->setInt("diffuseTexture", Diffuse);
+
+	celestrials[0]->Draw();
+
 }
 
 void Scene::renderShadowMaps() {
@@ -451,7 +448,7 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 		parent = parent->parent;
 	}
 	mTransform = glm::translate(mTransform, (glm::vec3)(*toDraw->position));
-	mTransform = (*toDraw->rotationMatrix) * mTransform;
+	mTransform = mTransform * (*toDraw->rotationMatrix);
 	if (toDraw->scale != 1.0f && toDraw->scale>0)
 		mTransform = glm::scale(mTransform, toDraw->scale, toDraw->scale, toDraw->scale);
 	shader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
