@@ -90,13 +90,14 @@ float movementSensitivity = 0.3;
 blendObject *test;
 blendObject *plane;
 
-blendObject *rock;
+blendObject *saturnRing;
+blendObject *asteroidField;
 
 //glSphere* moon;
 //glSphere* earth;
 
 glSphere** celestrials;
-unsigned const short celestrialsCount = 9;
+unsigned const short celestrialsCount = 10;
 glSphere* prepareCelestrial(float size, std::string name, 
 	glm::vec3 atmoColor, 
 	Drawable* parent, 
@@ -133,7 +134,7 @@ Shader* pickingShader;
 
 Skybox* skybox;
 
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 unsigned int depthCubemap;
 unsigned int depthMapFBO;
 
@@ -149,8 +150,8 @@ glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, -0.1, -1));
 glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);
 
-float orbitFactor = 0.00002f;
-float rotFactor = 0.02f;
+float orbitFactor;
+float rotFactor;
 
 /*GLuint pickingFBO;
 GLuint pickingPrimitiveTexture;

@@ -37,23 +37,31 @@ Scene::~Scene()
 //--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-	float x = 150.0f / 0.39f;
+	float x = 5.0f / 0.39f;
 	celestrials = new glSphere*[celestrialsCount];
-	celestrials[Sun] = prepareCelestrial(109.3f, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02f);
+	celestrials[Sun] = prepareCelestrial(0.3f, "sun", glm::vec3(0), NULL, glm::vec3(0), 1, 0.02f);
 	celestrials[Mercury] = prepareCelestrial(0.3829f, "mercury", glm::vec3(0), celestrials[Sun], glm::vec3(0.39f,0,0)*x, 58.64f, 0.24f);
-	celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.72f, 0, 0)*x, -243.02f, 0.62f);
-	celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1, 0, 0)*x, 1.0f, 1.0f);
-	celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0), celestrials[Sun], glm::vec3(1.52f, 0, 0)*x, 1.03f, 1.88f);
+	celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.62f, 0, 0)*x, -243.02f, 0.62f);
+	celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1.2, 0, 0)*x, 1.0f, 1.0f);
+		celestrials[Moon] = prepareCelestrial(0.2f, "moon", glm::vec3(0), celestrials[Earth], glm::vec3(3, 0, 0), -1.0f, 1.0f);
+	celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0.7,0,0), celestrials[Sun], glm::vec3(1.9f, 0, 0)*x, 1.03f, 1.88f);
 	celestrials[Jupiter] = prepareCelestrial(10.97f, "jupiter", glm::vec3(0), celestrials[Sun], glm::vec3(5.2f, 0, 0)*x, 0.41f, 11.86f);
 	celestrials[Saturn] = prepareCelestrial(9.140f, "saturn", glm::vec3(0), celestrials[Sun], glm::vec3(9.54f, 0, 0)*x, 0.43f, 29.46f);
 	celestrials[Uranus] = prepareCelestrial(3.981f, "uranus", glm::vec3(0), celestrials[Sun], glm::vec3(19.22f, 0, 0)*x, -0.72f, 84.01f);
 	celestrials[Neptune] = prepareCelestrial(3.865f, "neptune", glm::vec3(0), celestrials[Sun], glm::vec3(30.06f, 0, 0)*x, 0.67f, 167.8f);
 	//celestrials[Moon] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
 
-	rock = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 3000);
-	rock->position = new glm::vec3(0, 10, 0);
+	saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 10000);
+	saturnRing->setOrbitInfo(celestrials[Saturn], glm::vec3(0, 0, 0), 0.41f, 11.86f);
 
-	cameraParent = celestrials[Earth];
+	/// TODO: Implement asteroids field
+	//saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg", NULL, NULL, NULL, 10000);
+	//saturnRing->setOrbitInfo(celestrials[Sun], glm::vec3(0, 0, 0), 0.41f, 11.86f);
+
+	cameraParent = celestrials[Mercury];
+
+	orbitFactor = 0.02f;
+	rotFactor = 0.1;
 }
 
 glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoColor, Drawable* parent, glm::vec3 pos, float rotSpeed, float orbitSpeed) {
@@ -63,6 +71,7 @@ glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoC
 		mergeTwoStrings(TEX_LOCATION, name + "_normal.jpg"),
 		mergeTwoStrings(TEX_LOCATION, name + "_extra.jpg"),
 		atmoColor);
+	pos = glm::rotate(pos, (float)(rand() % 360), glm::vec3(0, 1, 0));
 	sphere->setOrbitInfo(parent, pos, orbitSpeed, rotSpeed);
 	return sphere;
 }
@@ -149,6 +158,8 @@ GLuint Scene::LoadShader(GLenum type,const char *file_name)
 // inicjuje proces renderowania OpenGL
 void Scene::Init()
 {
+	Drawable::meshManager = new MeshManager();
+
 	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
 	glewOK = err == GLEW_OK;
@@ -211,8 +222,8 @@ void Scene::Init()
 void Scene::Animate()
 {
 	for (int i = 0; i < celestrialsCount; i++) {
-		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), celestrials[i]->orbitSpeed*orbitFactor, glm::vec3(0, 1, 0));
-		*(celestrials[i]->rotationMatrix) = glm::rotate(*(celestrials[i]->rotationMatrix), celestrials[i]->rotSpeed*rotFactor, glm::vec3(0, 1, 0));
+		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), orbitFactor/celestrials[i]->orbitSpeed, glm::vec3(0, 1, 0));
+		*(celestrials[i]->rotationMatrix) = glm::rotate(*(celestrials[i]->rotationMatrix), rotFactor/celestrials[i]->rotSpeed, glm::vec3(0, 1, 0));
 	}
 }
 //--------------------------------------------------------------------------------------------
@@ -478,7 +489,7 @@ void Scene::renderScene(Shader* shader) {
 		RenderDrawable(shader, celestrials[i]);
 	}
 
-	RenderDrawable(shader, rock);
+	RenderDrawable(shader, saturnRing);
 
 }
 

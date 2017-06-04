@@ -9,7 +9,7 @@ glSphere::glSphere(float R, char* diffuseTexture,
 		diffuseTexture, specularTexture, normalTexture, extraTexture)
 {
 	this->scale = R;
-	if (atmoColor.r != 0 && atmoColor.g != 0 && atmoColor.b != 0) {
+	if (atmoColor.r != 0.0f || atmoColor.g != 0.0f || atmoColor.b != 0.0f) {
 		hasAtmo = true;
 		this->atmoColor = new glm::vec3(atmoColor);
 	}

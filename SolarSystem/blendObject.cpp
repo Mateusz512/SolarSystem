@@ -72,85 +72,119 @@ void blendObject::Load(char* filename, char* diffuseTexture, char* specularTextu
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;
 
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
 	
-	ReadFromFile(filename, vertices, uvs, normals);
-
-	std::vector<unsigned short> indices;
-	std::vector<glm::vec3> indexed_vertices;
-	std::vector<glm::vec2> indexed_uvs;
-	std::vector<glm::vec3> indexed_normals;
-	indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
-
-	vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(
-		0,                  // attribute
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
-	);
-
-	uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(
-		1,                                // attribute
-		2,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-	);
-
-	normalbuffer;
-	glGenBuffers(1, &normalbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-	glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(
-		2,                                // attribute
-		3,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-	);
-	
-	// Generate a buffer for the indices as well
-	elementbuffer;
-	glGenBuffers(1, &elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-
-	if (instancesCount > 0) {
-		PrepareInstancesMatrices();
-
-		glGenBuffers(1, &modelMatricesBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
-
-		for (unsigned int i = 0; i < 4; i++) {
-			glEnableVertexAttribArray(3 + i);
-			glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
-				(const GLvoid*)(sizeof(GLfloat) * i * 4));
-			glVertexAttribDivisor(3 + i, 1);
-		}
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instancesCount, modelMatrices, GL_DYNAMIC_DRAW);		
+	MeshBuffers* meshBuffers = meshManager->alreadyLoaded(filename);
+	if (meshBuffers != NULL && instancesCount==0) {
+		this->m_VAO = meshBuffers->m_VAO;
+		this->size = meshBuffers->size;
+		this->vertexbuffer = meshBuffers->vertexbuffer;
+		this->uvbuffer = meshBuffers->uvbuffer;
+		this->normalbuffer = meshBuffers->normalbuffer;
+		this->elementbuffer = meshBuffers->elementbuffer;
+		this->modelMatrixBuffer = meshBuffers->modelMatrixBuffer;
 	}
+	else {
 
-	glBindVertexArray(0);
-	size = indices.size();
+		glGenVertexArrays(1, &m_VAO);
+		glBindVertexArray(m_VAO);
+
+		ReadFromFile(filename, vertices, uvs, normals);
+
+		std::vector<unsigned short> indices;
+		std::vector<glm::vec3> indexed_vertices;
+		std::vector<glm::vec2> indexed_uvs;
+		std::vector<glm::vec3> indexed_normals;
+		indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+
+		vertexbuffer;
+		glGenBuffers(1, &vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		uvbuffer;
+		glGenBuffers(1, &uvbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		normalbuffer;
+		glGenBuffers(1, &normalbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+		glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(
+			2,                                // attribute
+			3,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Generate a buffer for the indices as well
+		elementbuffer;
+		glGenBuffers(1, &elementbuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+
+		if (instancesCount > 0) {
+			PrepareInstancesMatrices();
+
+			glGenBuffers(1, &modelMatrixBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, modelMatrixBuffer);
+
+			for (unsigned int i = 0; i < 4; i++) {
+				glEnableVertexAttribArray(3 + i);
+				glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
+					(const GLvoid*)(sizeof(GLfloat) * i * 4));
+				glVertexAttribDivisor(3 + i, 1);
+			}
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instancesCount, modelMatrices, GL_DYNAMIC_DRAW);
+
+
+			for (int i = 0; i < instancesCount; i++)
+			{
+				modelMatrices[i] = glm::transpose(glm::inverse(modelMatrices[i]));
+			}
+
+			glGenBuffers(1, &normalMatrixBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, normalMatrixBuffer);
+
+			for (unsigned int i = 0; i < 4; i++) {
+				glEnableVertexAttribArray(7 + i);
+				glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
+					(const GLvoid*)(sizeof(GLfloat) * i * 4));
+				glVertexAttribDivisor(7 + i, 1);
+			}
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instancesCount, modelMatrices, GL_DYNAMIC_DRAW);
+			delete[] modelMatrices;
+		}
+
+		glBindVertexArray(0);
+		size = indices.size();
+
+		meshManager->add(filename,new MeshBuffers(m_VAO,size, vertexbuffer, uvbuffer, normalbuffer, elementbuffer, modelMatrixBuffer));
+	}
 }
 
 void blendObject::ReadFromFile(char * filename,
@@ -230,7 +264,7 @@ void blendObject::ReadFromFile(char * filename,
 void blendObject::PrepareInstancesMatrices() {
 	modelMatrices = new glm::mat4[instancesCount];
 	srand(1337); // initialize random seed	
-	float radius = 15.0;
+	float radius = 25.0;
 	float offset = 5.0f;
 	for (int i = 0; i < instancesCount; i++)
 	{
@@ -240,14 +274,14 @@ void blendObject::PrepareInstancesMatrices() {
 		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
 		float x = sin(angle) * radius + displacement;
 		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
+		float y = displacement * 0.1f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
 		float z = cos(angle) * radius + displacement;
 		model = glm::translate(model, glm::vec3(x, y, z));
 
 		// 2. scale: Scale between 0.05 and 0.25f
 		float scale = (rand() % 20) / 100.0f + 0.05;
-		model = glm::scale(model, glm::vec3(scale));
+		model = glm::scale(model, glm::vec3(scale/2.0f));
 
 		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
 		float rotAngle = (rand() % 360);

@@ -32,10 +32,7 @@ public:
 protected:
 
 	glm::mat4 * modelMatrices;
-	int instancesCount;
-	unsigned int modelMatricesBuffer;
-	GLuint VAO;
-
+	int instancesCount=0;
 
 	void Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture);
 	void ReadFromFile(char * filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);

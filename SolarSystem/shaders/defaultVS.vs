@@ -2,7 +2,8 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoords;
 layout (location = 2) in vec3 aNormal;                                   
-layout (location = 3) in mat4 instanceModel;            
+layout (location = 3) in mat4 instanceModel;                             
+layout (location = 7) in mat4 instanceNormal;           
 
 out vec2 TexCoords;
 
@@ -21,10 +22,12 @@ void main()
 {
 	if(gl_InstanceID != 0){		
 		gl_Position = projection * view * model * instanceModel * vec4(aPos, 1.0);
+		vs_out.FragPos = vec3(model * instanceModel * vec4(aPos, 1.0));
+		vs_out.Normal = (instanceNormal * vec4(aNormal,0.0)).xyz;
 	}else{
 		gl_Position = projection * view * model * vec4(aPos, 1.0);	
+		vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+		vs_out.Normal = (normalMatrix * vec4(aNormal,0.0)).xyz;
 	}
-    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
-    vs_out.Normal = (normalMatrix * vec4(aNormal,0.0)).xyz;
     vs_out.TexCoords = aTexCoords;
 }

@@ -125,6 +125,8 @@
     <ClInclude Include="glew.h" />
     <ClInclude Include="globject.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MeshBuffers.h" />
+    <ClInclude Include="MeshManager.h" />
     <ClInclude Include="printer.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
@@ -139,6 +141,8 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="globject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshBuffers.cpp" />
+    <ClCompile Include="MeshManager.cpp" />
     <ClCompile Include="printer.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="Skybox.cpp" />

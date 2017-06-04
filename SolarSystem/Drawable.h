@@ -1,10 +1,12 @@
 #pragma once
 #include <glm\glm.hpp>
 #include "texture.h"
+#include "MeshManager.h"
 
 class Drawable {
 public:
 	static int Drawable::globalID;
+	static MeshManager* Drawable::meshManager;
 	int ID;
 	Drawable() {
 		ID = Drawable::globalID++;
@@ -28,6 +30,7 @@ public:
 	float orbitSpeed;
 	float rotSpeed;
 	glm::mat4* rotationMatrix;
+	glm::vec3* inclination;			/// TODO: Implement inclination
 	float scale = 1.0f;
 		
 	void setOrbitInfo(Drawable* parent, glm::vec3 pos, float orbitSpeed, float rotSpeed) {
@@ -46,4 +49,5 @@ protected:
 	GLuint normalbuffer;
 	GLuint elementbuffer;
 	GLuint modelMatrixBuffer;
+	GLuint normalMatrixBuffer;
 };
