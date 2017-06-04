@@ -37,19 +37,26 @@ Scene::~Scene()
 //--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-
+	float x = 150.0f / 0.39f;
 	celestrials = new glSphere*[celestrialsCount];
-	celestrials[Sun] = prepareCelestrial(4.0f, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02f);
-	celestrials[1] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(10,0,0), 0.06f, 0.06f);
-	celestrials[2] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
+	celestrials[Sun] = prepareCelestrial(109.3f, "sun", glm::vec3(0), NULL, glm::vec3(0), 0, 0.02f);
+	celestrials[Mercury] = prepareCelestrial(0.3829f, "mercury", glm::vec3(0), celestrials[Sun], glm::vec3(0.39f,0,0)*x, 58.64f, 0.24f);
+	celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.72f, 0, 0)*x, -243.02f, 0.62f);
+	celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1, 0, 0)*x, 1.0f, 1.0f);
+	celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0), celestrials[Sun], glm::vec3(1.52f, 0, 0)*x, 1.03f, 1.88f);
+	celestrials[Jupiter] = prepareCelestrial(10.97f, "jupiter", glm::vec3(0), celestrials[Sun], glm::vec3(5.2f, 0, 0)*x, 0.41f, 11.86f);
+	celestrials[Saturn] = prepareCelestrial(9.140f, "saturn", glm::vec3(0), celestrials[Sun], glm::vec3(9.54f, 0, 0)*x, 0.43f, 29.46f);
+	celestrials[Uranus] = prepareCelestrial(3.981f, "uranus", glm::vec3(0), celestrials[Sun], glm::vec3(19.22f, 0, 0)*x, -0.72f, 84.01f);
+	celestrials[Neptune] = prepareCelestrial(3.865f, "neptune", glm::vec3(0), celestrials[Sun], glm::vec3(30.06f, 0, 0)*x, 0.67f, 167.8f);
+	//celestrials[Moon] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
 
 	rock = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 3000);
 	rock->position = new glm::vec3(0, 10, 0);
 
-	cameraParent = celestrials[Sun];
+	cameraParent = celestrials[Earth];
 }
 
-glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoColor, Drawable* parent, glm::vec3 pos, float orbitSpeed, float rotSpeed) {	
+glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoColor, Drawable* parent, glm::vec3 pos, float rotSpeed, float orbitSpeed) {
 	glSphere* sphere = new glSphere(size, 
 		mergeTwoStrings(TEX_LOCATION, name + "_diff.jpg"),
 		mergeTwoStrings(TEX_LOCATION, name + "_spec.jpg"),

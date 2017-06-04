@@ -40,7 +40,7 @@ void ThrowException(char *msg);
 void ThrowException(std::string *msg);
 
 enum CelestrialObject {
-	Sun=0,Mercury,Venus,Earth,Mars,Jupiter,Uranus,Neptune,
+	Sun=0,Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,
 	Moon,Phobos,Deimos,Europa,Ganimedes,Io,Callisto,Titan,Encelatus
 };
 

@@ -96,11 +96,11 @@ blendObject *rock;
 //glSphere* earth;
 
 glSphere** celestrials;
-unsigned const short celestrialsCount = 3;
+unsigned const short celestrialsCount = 9;
 glSphere* prepareCelestrial(float size, std::string name, 
 	glm::vec3 atmoColor, 
 	Drawable* parent, 
-	glm::vec3 pos, float orbitSpeed, float rotSpeed);
+	glm::vec3 pos, float rotSpeed, float orbitSpeed);
 
 glPrinter *Prn;
 
@@ -149,8 +149,8 @@ glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, -0.1, -1));
 glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);
 
-float orbitFactor = 2;
-float rotFactor = 1;
+float orbitFactor = 0.00002f;
+float rotFactor = 0.02f;
 
 /*GLuint pickingFBO;
 GLuint pickingPrimitiveTexture;
