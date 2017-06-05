@@ -30,6 +30,18 @@
 //----------------------------------- DEFINES -------------------------------------------------
 #define ESCAPE 27
 
+
+struct PointLight {
+	glm::vec3 position;
+
+	float constant;
+	float linear;
+	float quadratic;
+
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+};
 //--------------------------------------------------------------------------------------------
 // 								CLASS INTERFACE
 //--------------------------------------------------------------------------------------------
@@ -89,6 +101,10 @@ float movementSensitivity = 0.3;
 
 blendObject *test;
 blendObject *plane;
+blendObject *satellite;
+blendObject *satellite0;
+blendObject *satellite1;
+blendObject *satellite2;
 
 blendObject *saturnRing;
 blendObject *asteroidField;
@@ -153,6 +169,8 @@ glm::vec2 previousMousePosition = glm::vec2(0, 0);
 float orbitFactor;
 float rotFactor;
 
+static const int pointLightsCount = 10;
+PointLight pointLights[pointLightsCount];
 /*GLuint pickingFBO;
 GLuint pickingPrimitiveTexture;
 GLuint pickingDepthTexture;*/

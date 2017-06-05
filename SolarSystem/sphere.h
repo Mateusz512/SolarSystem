@@ -14,6 +14,9 @@ class glSphere: public blendObject
 		void Draw();
 
 		bool hasAtmo;
+		glm::mat4** atmoRot;
+		int atmoCount = 2;
+
 		glm::vec3* atmoColor;
 	protected:	
 };

@@ -123,6 +123,7 @@ void indexVBO(
 
 		if (found) { // A similar vertex is already in the VBO, use it instead !
 			out_indices.push_back(index);
+
 		}
 		else { // If not, it needs to be added in the output data.
 			out_vertices.push_back(in_vertices[i]);

@@ -1,0 +1,14 @@
+# Blender MTL File: 'Spaceship.blend'
+# Material Count: 1
+
+newmtl SpaceShipUV
+Ns 27.450980
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\blender-2.45-windows\Models\Commerical Models\Spaceship\SpaceShipUV.jpg
+map_Bump -bm 0.500000 G:\\blender-2.45-windows\\Models\\Commerical Models\\SpaceShipNormal.jpg

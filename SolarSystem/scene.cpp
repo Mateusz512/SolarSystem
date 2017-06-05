@@ -22,6 +22,10 @@ glm::vec3 getGlobalPos(Drawable* obj) {
 	Pos += *obj->position;
 	return Pos;
 }
+
+float random(float LO, float HI) {
+	return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+}
 Scene::Scene(int new_width, int new_height)
 {
 	width = new_width;
@@ -44,7 +48,7 @@ void Scene::PrepareObjects()
 	celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.62f, 0, 0)*x, -243.02f, 0.62f);
 	celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1.2, 0, 0)*x, 1.0f, 1.0f);
 		celestrials[Moon] = prepareCelestrial(0.2f, "moon", glm::vec3(0), celestrials[Earth], glm::vec3(3, 0, 0), -1.0f, 1.0f);
-	celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0.7,0,0), celestrials[Sun], glm::vec3(1.9f, 0, 0)*x, 1.03f, 1.88f);
+	celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0.7,0.2,0.2), celestrials[Sun], glm::vec3(1.9f, 0, 0)*x, 1.03f, 1.88f);
 	celestrials[Jupiter] = prepareCelestrial(10.97f, "jupiter", glm::vec3(0), celestrials[Sun], glm::vec3(5.2f, 0, 0)*x, 0.41f, 11.86f);
 	celestrials[Saturn] = prepareCelestrial(9.140f, "saturn", glm::vec3(0), celestrials[Sun], glm::vec3(9.54f, 0, 0)*x, 0.43f, 29.46f);
 	celestrials[Uranus] = prepareCelestrial(3.981f, "uranus", glm::vec3(0), celestrials[Sun], glm::vec3(19.22f, 0, 0)*x, -0.72f, 84.01f);
@@ -54,11 +58,23 @@ void Scene::PrepareObjects()
 	saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 10000);
 	saturnRing->setOrbitInfo(celestrials[Saturn], glm::vec3(0, 0, 0), 0.41f, 11.86f);
 
+	satellite1 = new blendObject("objects\\SpaceShip2.obj", "textures\\SpaceShip2.jpg", NULL, NULL, NULL);
+	satellite1->scale = 0.1;
+	satellite1->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 0), 0.41f, 11.86f);
+	satellite2 = new blendObject("objects\\SpaceShip3.obj", "textures\\SpaceShip3.jpg", NULL, NULL, NULL);
+	satellite2->scale = 0.1;
+	satellite2->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 1), 0.41f, 11.86f);
+	satellite0 = new blendObject("objects\\hst.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	satellite0->scale = 0.1;
+	satellite0->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
+	satellite = new blendObject("objects\\SpaceShip.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	satellite->scale = 0.1;
+	satellite->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, 2), 0.41f, 11.86f);
 	/// TODO: Implement asteroids field
 	//saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg", NULL, NULL, NULL, 10000);
 	//saturnRing->setOrbitInfo(celestrials[Sun], glm::vec3(0, 0, 0), 0.41f, 11.86f);
 
-	cameraParent = celestrials[Mercury];
+	cameraParent = celestrials[Earth];
 
 	orbitFactor = 0.02f;
 	rotFactor = 0.1;
@@ -214,7 +230,19 @@ void Scene::Init()
 	
 	skybox = new Skybox(skyboxShader);
 
-
+	srand(static_cast <unsigned> (time(0)));
+	for (int i = 0; i < pointLightsCount; i++) {
+		pointLights[i].position = glm::rotate(glm::vec3(3, 0, 0), 36.0f * i, glm::vec3(0, 1, 0));
+		pointLights[i].ambient = glm::vec3(
+			random(0.01f,0.05f), random(0.01f, 0.05f), random(0.01f, 0.05f)); 
+		pointLights[i].diffuse = glm::vec3(
+			random(0.1f, 0.8f), random(0.01f, 0.8f), random(0.01f, 0.8f)); 
+		pointLights[i].specular = glm::vec3(
+			random(0.5f, 1.0f), random(0.5f, 1.0f), random(0.5f, 1.0f));
+		pointLights[i].constant=1.0f;
+		pointLights[i].linear=0.09f;
+		pointLights[i].quadratic=0.032f;
+	}
 }
 
 //--------------------------------------------------------------------------------------------
@@ -224,9 +252,16 @@ void Scene::Animate()
 	for (int i = 0; i < celestrialsCount; i++) {
 		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), orbitFactor/celestrials[i]->orbitSpeed, glm::vec3(0, 1, 0));
 		*(celestrials[i]->rotationMatrix) = glm::rotate(*(celestrials[i]->rotationMatrix), rotFactor/celestrials[i]->rotSpeed, glm::vec3(0, 1, 0));
+		if (celestrials[i]->hasAtmo) {
+			*(celestrials[i]->atmoRot[0]) = glm::rotate(*(celestrials[i]->atmoRot[0]), -rotFactor / celestrials[i]->rotSpeed/2.0f, glm::vec3(0, 1, 0));
+			*(celestrials[i]->atmoRot[1]) = glm::rotate(*(celestrials[i]->atmoRot[1]), rotFactor / celestrials[i]->rotSpeed/2.0f, glm::vec3(0, 1, 0));
+		}
 	}
 	*(saturnRing->position) = glm::rotate(*(saturnRing->position), orbitFactor / saturnRing->orbitSpeed, glm::vec3(0, 1, 0));
 	*(saturnRing->rotationMatrix) = glm::rotate(*(saturnRing->rotationMatrix), rotFactor / saturnRing->rotSpeed, glm::vec3(0, 1, 0));
+	for (int i = 0; i < pointLightsCount; i++) {
+		pointLights[i].position = glm::rotate(pointLights[i].position, 2.0f, glm::vec3(0, 1, 0));
+	}
 }
 //--------------------------------------------------------------------------------------------
 // kontrola naciskania klawiszy klawiatury
@@ -399,6 +434,15 @@ void Scene::Draw()
 
 	// ustaw macierz projekcji na perspektywiczna
 	defaultShader->use();
+	for (int i = 0; i < pointLightsCount; i++) {
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].position", getGlobalPos(celestrials[Earth])+pointLights[i].position);
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
+		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
+		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
+		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
+	}
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
 	
 	glm::vec3 eyePos = getGlobalPos(cameraParent);
@@ -459,7 +503,7 @@ void Scene::Draw()
 void Scene::DrawSun(Shader* shader) {
 
 	shader->use();
-	defaultShader->setInt("shadows", 0);
+	defaultShader->setInt("shadows", -1);
 	glm::mat4 mTransform = glm::mat4(1);
 	mTransform = (*celestrials[Sun]->rotationMatrix) * mTransform;
 	if (celestrials[Sun]->scale != 1.0f && celestrials[Sun]->scale>0)
@@ -515,7 +559,10 @@ void Scene::renderScene(Shader* shader) {
 	}
 
 	RenderDrawable(shader, saturnRing);
-
+	RenderDrawable(shader, satellite);
+	RenderDrawable(shader, satellite0);
+	RenderDrawable(shader, satellite1);
+	RenderDrawable(shader, satellite2);
 }
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
@@ -575,11 +622,15 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 }
 
 void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
+	if(toDraw==celestrials[Uranus]||toDraw==celestrials[Neptune])
+		shader->setInt("shadows", 0);
 	TransformAndDraw(shader, toDraw);
 	if (glSphere* planet = dynamic_cast<glSphere*>(toDraw)) {
 		float initScale = planet->scale;
 		if (planet->hasAtmo) {
-			planet->scale = initScale + initScale*0.05f;
+			planet->scale = initScale + initScale*0.02f;
+			glm::mat4* initRot = planet->rotationMatrix;
+			planet->rotationMatrix = planet->atmoRot[0];
 			shader->setInt("isAtmo", 1);
 			shader->setVec3("atmoColor", *(planet->atmoColor));
 
@@ -587,13 +638,19 @@ void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glBlendEquation(GL_FUNC_ADD);
 			TransformAndDraw(shader, planet);
+			planet->rotationMatrix = planet->atmoRot[1];
+			planet->scale = initScale + initScale*0.05f;
+			TransformAndDraw(shader, planet);
 			glDisable(GL_BLEND);
 
 			shader->setInt("isAtmo", 0);
 			shader->setVec3("atmoColor", glm::vec3(0));
+			planet->rotationMatrix = initRot;
 			planet->scale = initScale;
 		}
 	}
+	if (toDraw == celestrials[Uranus] || toDraw == celestrials[Neptune])
+		shader->setInt("shadows", 1);
 }
 
 float Scene::readMouseClickObj(int x, int y) {
