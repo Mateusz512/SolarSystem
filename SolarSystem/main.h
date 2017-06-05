@@ -7,7 +7,7 @@
 #include <Windowsx.h>
 #endif
 
-bool isDragging = false;
+DraggingMode dr = NotDragging;
 bool hasLeft = false;
 
 float currentX;

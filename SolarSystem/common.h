@@ -52,5 +52,9 @@ enum Textures {
 	ShadowCube = 4
 };
 
+enum DraggingMode {
+	NotDragging,Left,Middle,Right
+};
+
 
 #endif

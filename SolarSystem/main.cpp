@@ -236,8 +236,8 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 		{
 			POINT cPos;
 			GetCursorPos(&cPos);
-			SC->MouseMoved(cPos.x, cPos.y,isDragging);
-			if (isDragging) {
+			SC->MouseMoved(cPos.x, cPos.y, dr);
+			if (dr!=NotDragging) {
 				SC->Draw();
 				SwapBuffers(hDC);
 			}
@@ -245,25 +245,35 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 		}
 		case WM_NCMOUSELEAVE:
 		{
-			isDragging = false;
+			dr = NotDragging;
 			return 0;
 		}
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 		{
-			isDragging = true;
+			switch (uMsg) {
+				case WM_RBUTTONDOWN: dr = Right; break;
+				case WM_LBUTTONDOWN: dr = Left; break;
+				case WM_MBUTTONDOWN: dr = Middle; break;
+			}
 			POINT cPos;
 			GetCursorPos(&cPos);
 			currentX = cPos.x; currentY = cPos.y;
 			return 0;
 		}
+		case WM_RBUTTONUP:
+		case WM_MBUTTONUP:
 		case WM_LBUTTONUP:
 		{
-			isDragging = false;
+			dr = NotDragging;
 			POINT cPos;
 			GetCursorPos(&cPos);
 			if (currentX == cPos.x && currentY == cPos.y) {
+				RECT rect = { NULL };
+				GetWindowRect(hWnd, &rect);
 				SC->DrawPicking();
-				SC->LMBClicked(currentX, currentY);
+				SC->LMBClicked(currentX-rect.left, currentY-rect.top-30);
 				//SwapBuffers(hDC);			
 			}			
 			return 0;

@@ -69,7 +69,7 @@ void Animate(); // przeprowadza animacje sceny
 
 void KeyPressed(unsigned char key, int x, int y); // obsluga klawiatury
 
-void MouseMoved(int x, int y,bool dragged);
+void MouseMoved(int x, int y, DraggingMode dr);
 void MouseRolled(int dir);
 void LMBClicked(int x, int y);
 bool isFirstMouseMovement = true;

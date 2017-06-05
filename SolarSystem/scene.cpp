@@ -225,6 +225,8 @@ void Scene::Animate()
 		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), orbitFactor/celestrials[i]->orbitSpeed, glm::vec3(0, 1, 0));
 		*(celestrials[i]->rotationMatrix) = glm::rotate(*(celestrials[i]->rotationMatrix), rotFactor/celestrials[i]->rotSpeed, glm::vec3(0, 1, 0));
 	}
+	*(saturnRing->position) = glm::rotate(*(saturnRing->position), orbitFactor / saturnRing->orbitSpeed, glm::vec3(0, 1, 0));
+	*(saturnRing->rotationMatrix) = glm::rotate(*(saturnRing->rotationMatrix), rotFactor / saturnRing->rotSpeed, glm::vec3(0, 1, 0));
 }
 //--------------------------------------------------------------------------------------------
 // kontrola naciskania klawiszy klawiatury
@@ -237,6 +239,8 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 	case 38: { break; }
 	case 39: { break; }
 	case 40: { break; }
+	case 69: { cameraPosition *= 4*cameraParent->scale/glm::length(cameraPosition); } //E
+	case 82: { cameraDirection = glm::normalize(cameraPosition)*-1.0f; break; } //R
 	case 112: {LightAmbient += 0.1f; break; } // F1		
 	case 113: {LightAmbient -= 0.1f; break; } //F2		
 
@@ -261,13 +265,34 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 
 }
 
-void Scene::MouseMoved(int x, int y, bool dragged) {
+void Scene::MouseMoved(int x, int y, DraggingMode dr) {
 	currentMousePosition.x = x; currentMousePosition.y = y;
-	if (dragged) {
-		glm::vec2 delta = currentMousePosition - previousMousePosition;
-		cameraDirection = glm::rotate(cameraDirection, delta.x*mouseSensitivity, glm::vec3(0, 1, 0));
-		cameraDirection = glm::rotate(cameraDirection, delta.y*mouseSensitivity,
-			glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))));
+	glm::vec2 delta = currentMousePosition - previousMousePosition;
+	switch (dr) {
+		case Left:
+			cameraDirection = glm::rotate(cameraDirection, delta.x*mouseSensitivity, glm::vec3(0, 1, 0));
+			cameraDirection = glm::rotate(cameraDirection, delta.y*mouseSensitivity,
+				glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))));
+			break;
+		case Middle:
+			if (abs(delta.x) > abs(delta.y)) {
+			cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0)))
+				*movementSensitivity * 0.2f * ((delta.x>0)?-1.0f:1.0f);
+			}else{
+			cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(1, 0, 0)))
+				*movementSensitivity * 0.2f * ((delta.y>0) ? -1.0f : 1.0f);
+			}
+			break;
+		case Right:
+			if (abs(delta.x) > abs(delta.y)) {
+				cameraPosition = glm::rotate(cameraPosition, ((delta.x > 0) ? -1.0f : 1.0f)*3.0f , glm::vec3(0, 1, 0));
+				cameraDirection = glm::rotate(cameraDirection, ((delta.x > 0) ? -1.0f : 1.0f)*3.0f, glm::vec3(0, 1, 0));
+			}
+			else {
+				cameraPosition = glm::rotate(cameraPosition, ((delta.y < 0) ? -1.0f : 1.0f)*2.0f, glm::normalize(glm::cross(cameraPosition, glm::vec3(0, 1, 0))));
+				cameraDirection = glm::rotate(cameraDirection, ((delta.y < 0) ? -1.0f : 1.0f)*-2.0f, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))));
+			}
+			break;
 	}
 	previousMousePosition.x = x; previousMousePosition.y = y;
 	isFirstMouseMovement = false;
@@ -588,6 +613,11 @@ float Scene::readMouseClickObj(int x, int y) {
 			}
 		}
 		if (!clicked) return 0;
+		if (clicked == cameraParent) {
+			cameraPosition *= 4 * cameraParent->scale / glm::length(cameraPosition);
+			cameraDirection = glm::normalize(cameraPosition)*-1.0f;
+			return 0;
+		}
 		glm::vec3 pos =	getGlobalPos(cameraParent);
 		cameraParent = clicked;
 		glm::vec3 npos = getGlobalPos(clicked);
