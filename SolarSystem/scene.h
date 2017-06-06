@@ -41,6 +41,7 @@ struct PointLight {
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
+
 };
 //--------------------------------------------------------------------------------------------
 // 								CLASS INTERFACE
@@ -101,10 +102,12 @@ float movementSensitivity = 0.3;
 
 blendObject *test;
 blendObject *plane;
-blendObject *satellite;
-blendObject *satellite0;
-blendObject *satellite1;
-blendObject *satellite2;
+blendObject *toast;
+blendObject **satellites;
+int satellitesCount;
+//blendObject *satellite0;
+//blendObject *satellite1;
+//blendObject *satellite2;
 
 blendObject *saturnRing;
 blendObject *asteroidField;

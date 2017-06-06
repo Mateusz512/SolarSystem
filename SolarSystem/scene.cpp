@@ -58,18 +58,48 @@ void Scene::PrepareObjects()
 	saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 10000);
 	saturnRing->setOrbitInfo(celestrials[Saturn], glm::vec3(0, 0, 0), 0.41f, 11.86f);
 
-	satellite1 = new blendObject("objects\\SpaceShip2.obj", "textures\\SpaceShip2.jpg", NULL, NULL, NULL);
-	satellite1->scale = 0.1;
-	satellite1->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 0), 0.41f, 11.86f);
-	satellite2 = new blendObject("objects\\SpaceShip3.obj", "textures\\SpaceShip3.jpg", NULL, NULL, NULL);
-	satellite2->scale = 0.1;
-	satellite2->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 1), 0.41f, 11.86f);
-	satellite0 = new blendObject("objects\\hst.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	satellite0->scale = 0.1;
-	satellite0->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
-	satellite = new blendObject("objects\\SpaceShip.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	satellite->scale = 0.1;
-	satellite->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, 2), 0.41f, 11.86f);
+	toast = new blendObject("objects\\toast.obj", "textures\\toast.jpg", NULL, NULL, NULL);
+	toast->scale = 0.02;
+	toast->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
+
+	satellitesCount = 12;
+	satellites = new blendObject*[satellitesCount];
+	satellites[0] = new blendObject("objects\\SpaceShip2.obj", "textures\\SpaceShip2.jpg", NULL, NULL, NULL);
+	satellites[0]->scale = 0.1;
+	satellites[0]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 0), 0.41f, 11.86f);
+	satellites[1] = new blendObject("objects\\SpaceShip3.obj", "textures\\SpaceShip3.jpg", NULL, NULL, NULL);
+	satellites[1]->scale = 0.1;
+	satellites[1]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 1), 0.41f, 11.86f);
+	satellites[2] = new blendObject("objects\\hst.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	satellites[2]->scale = 0.1;
+	satellites[2]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
+	satellites[3] = new blendObject("objects\\SpaceShip.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	satellites[3]->scale = 0.1;
+	satellites[3]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, 2), 0.41f, 11.86f);
+	satellites[4] = new blendObject("objects\\SpaceShip4.obj", "textures\\SpaceShip4.jpg", NULL, NULL, NULL);
+	satellites[4]->scale = 0.05;
+	satellites[4]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 0), 0.41f, 11.86f);
+	satellites[5] = new blendObject("objects\\SpaceShip5.obj", "textures\\SpaceShip5.jpg", NULL, NULL, NULL);
+	satellites[5]->scale = 0.05;
+	satellites[5]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, -1), 0.41f, 11.86f);
+	satellites[6] = new blendObject("objects\\SpaceShip6.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	satellites[6]->scale = 0.2;
+	satellites[6]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 1), 0.41f, 11.86f);
+	satellites[7] = new blendObject("objects\\SpaceShip7.obj", "textures\\SpaceShip7.jpg", NULL, NULL, NULL);
+	satellites[7]->scale = 0.2;
+	satellites[7]->setOrbitInfo(celestrials[Earth], glm::vec3(-1, 0, 2), 0.41f, 11.86f);
+	satellites[8] = new blendObject("objects\\SpaceShip8.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	satellites[8]->scale = 0.3;
+	satellites[8]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, -1), 0.41f, 11.86f);
+	satellites[9] = new blendObject("objects\\SpaceShip9.obj", "textures\\SpaceShip9.jpg", NULL, NULL, NULL);
+	satellites[9]->scale = 0.3;
+	satellites[9]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, -2), 0.41f, 11.86f);
+	satellites[10] = new blendObject("objects\\SpaceShip10.obj", "textures\\SpaceShip10.jpg", NULL, NULL, NULL);
+	satellites[10]->scale = 0.3;
+	satellites[10]->setOrbitInfo(celestrials[Earth], glm::vec3(-1.2, 0, -2), 0.41f, 11.86f);
+	satellites[11] = new blendObject("objects\\SpaceShip11.obj", "textures\\SpaceShip11.jpg", NULL, NULL, NULL);
+	satellites[11]->scale = 0.3;
+	satellites[11]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, -2), 0.41f, 11.86f);
 	/// TODO: Implement asteroids field
 	//saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg", NULL, NULL, NULL, 10000);
 	//saturnRing->setOrbitInfo(celestrials[Sun], glm::vec3(0, 0, 0), 0.41f, 11.86f);
@@ -260,7 +290,7 @@ void Scene::Animate()
 	*(saturnRing->position) = glm::rotate(*(saturnRing->position), orbitFactor / saturnRing->orbitSpeed, glm::vec3(0, 1, 0));
 	*(saturnRing->rotationMatrix) = glm::rotate(*(saturnRing->rotationMatrix), rotFactor / saturnRing->rotSpeed, glm::vec3(0, 1, 0));
 	for (int i = 0; i < pointLightsCount; i++) {
-		pointLights[i].position = glm::rotate(pointLights[i].position, 2.0f, glm::vec3(0, 1, 0));
+		pointLights[i].position = glm::rotate(pointLights[i].position, 0.2f, glm::vec3(0, 1, 0));
 	}
 }
 //--------------------------------------------------------------------------------------------
@@ -274,6 +304,7 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 	case 38: { break; }
 	case 39: { break; }
 	case 40: { break; }
+	case 86: { break; } //T
 	case 69: { cameraPosition *= 4*cameraParent->scale/glm::length(cameraPosition); } //E
 	case 82: { cameraDirection = glm::normalize(cameraPosition)*-1.0f; break; } //R
 	case 112: {LightAmbient += 0.1f; break; } // F1		
@@ -443,6 +474,10 @@ void Scene::Draw()
 		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
 		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
 	}
+	for (int i = 0; i < pointLightsCount; i++) {
+		*toast->position = pointLights[i].position;
+		RenderDrawable(defaultShader, toast);
+	}
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
 	
 	glm::vec3 eyePos = getGlobalPos(cameraParent);
@@ -557,12 +592,11 @@ void Scene::renderScene(Shader* shader) {
 	for (int i = 1; i < celestrialsCount; i++) {
 		RenderDrawable(shader, celestrials[i]);
 	}
+	for (int i = 0; i < satellitesCount; i++) {
+		RenderDrawable(shader, satellites[i]);
+	}
 
 	RenderDrawable(shader, saturnRing);
-	RenderDrawable(shader, satellite);
-	RenderDrawable(shader, satellite0);
-	RenderDrawable(shader, satellite1);
-	RenderDrawable(shader, satellite2);
 }
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
@@ -662,11 +696,19 @@ float Scene::readMouseClickObj(int x, int y) {
 	glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &Pixel);
 	
 	if (Pixel[0] != 0) {
-		glSphere* clicked = NULL;
+		Drawable* clicked = NULL;
 		for (int i = 0; i < celestrialsCount; i++) {
 			if (celestrials[i]->ID == Pixel[0]) {
 				clicked = celestrials[i];
 				break;
+			}
+		}
+		if (!clicked) {
+			for (int i = 0; i < satellitesCount; i++) {
+				if (satellites[i]->ID == Pixel[0]) {
+					clicked = satellites[i];
+					break;
+				}
 			}
 		}
 		if (!clicked) return 0;
