@@ -35,91 +35,87 @@ Scene::Scene(int new_width, int new_height)
 // Domyslny destruktor 
 Scene::~Scene()
 {
-	delete defaultShader;
-	delete depthShader;
+	if(defaultShader) delete defaultShader;
+	if(depthShader) delete depthShader;
+	defaultShader = NULL;
+	depthShader = NULL;
 }
 //--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-	float x = 5.0f / 0.39f;
-	celestrials = new glSphere*[celestrialsCount];
-	celestrials[Sun] = prepareCelestrial(0.3f, "sun", glm::vec3(0), NULL, glm::vec3(0), 1, 0.02f);
-	celestrials[Mercury] = prepareCelestrial(0.3829f, "mercury", glm::vec3(0), celestrials[Sun], glm::vec3(0.39f,0,0)*x, 58.64f, 0.24f);
-	celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.62f, 0, 0)*x, -243.02f, 0.62f);
-	celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1.2, 0, 0)*x, 1.0f, 1.0f);
-		celestrials[Moon] = prepareCelestrial(0.2f, "moon", glm::vec3(0), celestrials[Earth], glm::vec3(3, 0, 0), -1.0f, 1.0f);
-	celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0.7,0.2,0.2), celestrials[Sun], glm::vec3(1.9f, 0, 0)*x, 1.03f, 1.88f);
-	celestrials[Jupiter] = prepareCelestrial(10.97f, "jupiter", glm::vec3(0), celestrials[Sun], glm::vec3(5.2f, 0, 0)*x, 0.41f, 11.86f);
-	celestrials[Saturn] = prepareCelestrial(9.140f, "saturn", glm::vec3(0), celestrials[Sun], glm::vec3(9.54f, 0, 0)*x, 0.43f, 29.46f);
-	celestrials[Uranus] = prepareCelestrial(3.981f, "uranus", glm::vec3(0), celestrials[Sun], glm::vec3(19.22f, 0, 0)*x, -0.72f, 84.01f);
-	celestrials[Neptune] = prepareCelestrial(3.865f, "neptune", glm::vec3(0), celestrials[Sun], glm::vec3(30.06f, 0, 0)*x, 0.67f, 167.8f);
-	//celestrials[Moon] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
+	//meshObjects.push_back(new meshObject())
+	//celestrials = new glSphere*[celestrialsCount];
+	//celestrials[Sun] = prepareCelestrial(0.3f, "sun", glm::vec3(0), NULL, glm::vec3(0), 1, 0.02f);
+	//celestrials[Mercury] = prepareCelestrial(0.3829f, "mercury", glm::vec3(0), celestrials[Sun], glm::vec3(0.39f,0,0)*x, 58.64f, 0.24f);
+	//celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.62f, 0, 0)*x, -243.02f, 0.62f);
+	//celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1.2, 0, 0)*x, 1.0f, 1.0f);
+	//celestrials[Moon] = prepareCelestrial(0.2f, "moon", glm::vec3(0), celestrials[Earth], glm::vec3(3, 0, 0), -1.0f, 1.0f);
+	//celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0.7,0.2,0.2), celestrials[Sun], glm::vec3(1.9f, 0, 0)*x, 1.03f, 1.88f);
+	//celestrials[Jupiter] = prepareCelestrial(10.97f, "jupiter", glm::vec3(0), celestrials[Sun], glm::vec3(5.2f, 0, 0)*x, 0.41f, 11.86f);
+	//celestrials[Saturn] = prepareCelestrial(9.140f, "saturn", glm::vec3(0), celestrials[Sun], glm::vec3(9.54f, 0, 0)*x, 0.43f, 29.46f);
+	//celestrials[Uranus] = prepareCelestrial(3.981f, "uranus", glm::vec3(0), celestrials[Sun], glm::vec3(19.22f, 0, 0)*x, -0.72f, 84.01f);
+	//celestrials[Neptune] = prepareCelestrial(3.865f, "neptune", glm::vec3(0), celestrials[Sun], glm::vec3(30.06f, 0, 0)*x, 0.67f, 167.8f);
+	////celestrials[Moon] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
 
-	saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 10000);
-	saturnRing->setOrbitInfo(celestrials[Saturn], glm::vec3(0, 0, 0), 0.41f, 11.86f);
+	//saturnRing = new meshObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 10000);
+	//saturnRing->setOrbitInfo(celestrials[Saturn], glm::vec3(0, 0, 0), 0.41f, 11.86f);
 
-	toast = new blendObject("objects\\toast.obj", "textures\\toast.jpg", NULL, NULL, NULL);
-	toast->scale = 0.02;
-	toast->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
+	//toast = new meshObject("objects\\toast.obj", "textures\\toast.jpg", NULL, NULL, NULL);
+	//toast->scale = 0.02;
+	//toast->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
 
-	satellitesCount = 12;
-	satellites = new blendObject*[satellitesCount];
-	satellites[0] = new blendObject("objects\\SpaceShip2.obj", "textures\\SpaceShip2.jpg", NULL, NULL, NULL);
-	satellites[0]->scale = 0.1;
-	satellites[0]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 0), 0.41f, 11.86f);
-	satellites[1] = new blendObject("objects\\SpaceShip3.obj", "textures\\SpaceShip3.jpg", NULL, NULL, NULL);
-	satellites[1]->scale = 0.1;
-	satellites[1]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 1), 0.41f, 11.86f);
-	satellites[2] = new blendObject("objects\\hst.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	satellites[2]->scale = 0.1;
-	satellites[2]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
-	satellites[3] = new blendObject("objects\\SpaceShip.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	satellites[3]->scale = 0.1;
-	satellites[3]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, 2), 0.41f, 11.86f);
-	satellites[4] = new blendObject("objects\\SpaceShip4.obj", "textures\\SpaceShip4.jpg", NULL, NULL, NULL);
-	satellites[4]->scale = 0.05;
-	satellites[4]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 0), 0.41f, 11.86f);
-	satellites[5] = new blendObject("objects\\SpaceShip5.obj", "textures\\SpaceShip5.jpg", NULL, NULL, NULL);
-	satellites[5]->scale = 0.05;
-	satellites[5]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, -1), 0.41f, 11.86f);
-	satellites[6] = new blendObject("objects\\SpaceShip6.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	satellites[6]->scale = 0.2;
-	satellites[6]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 1), 0.41f, 11.86f);
-	satellites[7] = new blendObject("objects\\SpaceShip7.obj", "textures\\SpaceShip7.jpg", NULL, NULL, NULL);
-	satellites[7]->scale = 0.2;
-	satellites[7]->setOrbitInfo(celestrials[Earth], glm::vec3(-1, 0, 2), 0.41f, 11.86f);
-	satellites[8] = new blendObject("objects\\SpaceShip8.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	satellites[8]->scale = 0.3;
-	satellites[8]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, -1), 0.41f, 11.86f);
-	satellites[9] = new blendObject("objects\\SpaceShip9.obj", "textures\\SpaceShip9.jpg", NULL, NULL, NULL);
-	satellites[9]->scale = 0.3;
-	satellites[9]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, -2), 0.41f, 11.86f);
-	satellites[10] = new blendObject("objects\\SpaceShip10.obj", "textures\\SpaceShip10.jpg", NULL, NULL, NULL);
-	satellites[10]->scale = 0.3;
-	satellites[10]->setOrbitInfo(celestrials[Earth], glm::vec3(-1.2, 0, -2), 0.41f, 11.86f);
-	satellites[11] = new blendObject("objects\\SpaceShip11.obj", "textures\\SpaceShip11.jpg", NULL, NULL, NULL);
-	satellites[11]->scale = 0.3;
-	satellites[11]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, -2), 0.41f, 11.86f);
-	/// TODO: Implement asteroids field
-	//saturnRing = new blendObject("objects\\rock.obj", "textures\\rock.jpg", NULL, NULL, NULL, 10000);
-	//saturnRing->setOrbitInfo(celestrials[Sun], glm::vec3(0, 0, 0), 0.41f, 11.86f);
+	//satellitesCount = 12;
+	//satellites = new meshObject*[satellitesCount];
+	//satellites[0] = new meshObject("objects\\SpaceShip2.obj", "textures\\SpaceShip2.jpg", NULL, NULL, NULL);
+	//satellites[0]->scale = 0.1;
+	//satellites[0]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 0), 0.41f, 11.86f);
+	//satellites[1] = new meshObject("objects\\SpaceShip3.obj", "textures\\SpaceShip3.jpg", NULL, NULL, NULL);
+	//satellites[1]->scale = 0.1;
+	//satellites[1]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 1), 0.41f, 11.86f);
+	//satellites[2] = new meshObject("objects\\hst.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	//satellites[2]->scale = 0.1;
+	//satellites[2]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
+	//satellites[3] = new meshObject("objects\\SpaceShip.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	//satellites[3]->scale = 0.1;
+	//satellites[3]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, 2), 0.41f, 11.86f);
+	//satellites[4] = new meshObject("objects\\SpaceShip4.obj", "textures\\SpaceShip4.jpg", NULL, NULL, NULL);
+	//satellites[4]->scale = 0.05;
+	//satellites[4]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 0), 0.41f, 11.86f);
+	//satellites[5] = new meshObject("objects\\SpaceShip5.obj", "textures\\SpaceShip5.jpg", NULL, NULL, NULL);
+	//satellites[5]->scale = 0.05;
+	//satellites[5]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, -1), 0.41f, 11.86f);
+	//satellites[6] = new meshObject("objects\\SpaceShip6.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	//satellites[6]->scale = 0.2;
+	//satellites[6]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 1), 0.41f, 11.86f);
+	//satellites[7] = new meshObject("objects\\SpaceShip7.obj", "textures\\SpaceShip7.jpg", NULL, NULL, NULL);
+	//satellites[7]->scale = 0.2;
+	//satellites[7]->setOrbitInfo(celestrials[Earth], glm::vec3(-1, 0, 2), 0.41f, 11.86f);
+	//satellites[8] = new meshObject("objects\\SpaceShip8.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
+	//satellites[8]->scale = 0.3;
+	//satellites[8]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, -1), 0.41f, 11.86f);
+	//satellites[9] = new meshObject("objects\\SpaceShip9.obj", "textures\\SpaceShip9.jpg", NULL, NULL, NULL);
+	//satellites[9]->scale = 0.3;
+	//satellites[9]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, -2), 0.41f, 11.86f);
+	//satellites[10] = new meshObject("objects\\SpaceShip10.obj", "textures\\SpaceShip10.jpg", NULL, NULL, NULL);
+	//satellites[10]->scale = 0.3;
+	//satellites[10]->setOrbitInfo(celestrials[Earth], glm::vec3(-1.2, 0, -2), 0.41f, 11.86f);
+	//satellites[11] = new meshObject("objects\\SpaceShip11.obj", "textures\\SpaceShip11.jpg", NULL, NULL, NULL);
+	//satellites[11]->scale = 0.3;
+	//satellites[11]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, -2), 0.41f, 11.86f);
 
-	cameraParent = celestrials[Earth];
+	meshObjects.push_back(newMeshObject("moon", glm::vec3(0, 1, 0)));
+	cameraParent = meshObjects[0];
 
-	orbitFactor = 0.02f;
-	rotFactor = 0.1;
 }
 
-glSphere* Scene::prepareCelestrial(float size, std::string name, glm::vec3 atmoColor, Drawable* parent, glm::vec3 pos, float rotSpeed, float orbitSpeed) {
-	glSphere* sphere = new glSphere(size, 
+meshObject* Scene::newMeshObject(std::string name, glm::vec3 pos) {
+	meshObject* mo = new meshObject(mergeTwoStrings(OBJ_LOCATION, name + ".obj"),
 		mergeTwoStrings(TEX_LOCATION, name + "_diff.jpg"),
 		mergeTwoStrings(TEX_LOCATION, name + "_spec.jpg"),
 		mergeTwoStrings(TEX_LOCATION, name + "_normal.jpg"),
-		mergeTwoStrings(TEX_LOCATION, name + "_extra.jpg"),
-		atmoColor);
-	pos = glm::rotate(pos, (float)(rand() % 360), glm::vec3(0, 1, 0));
-	sphere->setOrbitInfo(parent, pos, orbitSpeed, rotSpeed);
-	return sphere;
+		mergeTwoStrings(TEX_LOCATION, name + "_extra.jpg"));
+	mo->position = new glm::vec3(pos);
+	return mo;
 }
 
 //--------------------------------------------------------------------------------------------
@@ -136,71 +132,6 @@ void Scene::Resize(int new_width, int new_height)
 	mProjection = glm::perspective(cameraAngle, (GLfloat)width / (GLfloat)height, near_plane, far_plane);
 }
 //--------------------------------------------------------------------------------------------
-/*// laduje program shadera z zewnetrznego pliku
-GLuint Scene::LoadShader(GLenum type,const char *file_name)
-{
-  // zmienna plikowa
-  FILE *fil = NULL;
-  // sproboj otworzyc plik
-  fil = fopen(file_name,"rb");
-  // sprawdz, czy plik sie otworzyl
-  sprintf(_msg,"Nie mozna otworzyc %s",file_name);
-  if (fil == NULL)  ThrowException(_msg);
-
-  // okresl rozmiar pliku
-  fseek( fil, 0, SEEK_END );
-  long int file_size = ftell(fil);
-  // przewin na poczatek
-  rewind(fil);
-  // utworzenie bufora na kod zrodlowy programu shadera
-  GLchar *srcBuf = new GLchar[(file_size+1)*sizeof(GLchar)];
-
-  // przeczytanie kodu shadera z pliku
-  fread(srcBuf,1,file_size,fil);
-
-  // zamknij plik
-  fclose(fil);
-
-  // tekst programu MUSI miec NULL na koncu
-  srcBuf[file_size] = 0x00;
-
-  // utworzenie obiektu shadera
-  GLuint shader = glCreateShader(type);
-
-  // przypisanie zrodla do shadera
-  glShaderSource(shader,1,const_cast<const GLchar**>(&srcBuf),NULL);
-
-  // sprzatanie
-  delete[] srcBuf;
-
-  // proba skompilowania programu shadera
-  glCompileShader(shader);
-
-  // sprawdzenie czy sie udalo
-  GLint compile_status;
-  glGetShaderiv(shader,GL_COMPILE_STATUS,&compile_status);
-
-  if (compile_status != GL_TRUE) // nie udalo sie
-  {
-		GLint logLength;
-		glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logLength );
-		char *log = new char[logLength];
-		glGetShaderInfoLog( shader, logLength, NULL, log );
-		sprintf(_msg,"Blad kompilacji pliku shadera %s",file_name);
-		PrintLog(_msg);
-		PrintLog(log);
-		ThrowException("Blad kompilacji shadera");
-		delete []log;
-  }
-  else
-  {
-	  sprintf(_msg,"Plik shadera %s skompilowany",file_name);
-	  PrintLog(_msg);
-  }
-
-  return shader; // zwroc id shadera
-}*/
-//--------------------------------------------------------------------------------------------
 // inicjuje proces renderowania OpenGL
 void Scene::Init()
 {
@@ -208,13 +139,6 @@ void Scene::Init()
 
 	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
-	glewOK = err == GLEW_OK;
-	if (!glewOK)
-	{
-		sprintf(_msg, "GLew error: %s\n", glewGetErrorString(err));
-		err = 1;
-		ThrowException(_msg);
-	}
 
 	// przygotuj programy shaderow
 	//PreparePrograms();
@@ -279,19 +203,7 @@ void Scene::Init()
 // przeprowadza animacje sceny 
 void Scene::Animate()
 {
-	for (int i = 0; i < celestrialsCount; i++) {
-		*(celestrials[i]->position) = glm::rotate(*(celestrials[i]->position), orbitFactor/celestrials[i]->orbitSpeed, glm::vec3(0, 1, 0));
-		*(celestrials[i]->rotationMatrix) = glm::rotate(*(celestrials[i]->rotationMatrix), rotFactor/celestrials[i]->rotSpeed, glm::vec3(0, 1, 0));
-		if (celestrials[i]->hasAtmo) {
-			*(celestrials[i]->atmoRot[0]) = glm::rotate(*(celestrials[i]->atmoRot[0]), -rotFactor / celestrials[i]->rotSpeed/2.0f, glm::vec3(0, 1, 0));
-			*(celestrials[i]->atmoRot[1]) = glm::rotate(*(celestrials[i]->atmoRot[1]), rotFactor / celestrials[i]->rotSpeed/2.0f, glm::vec3(0, 1, 0));
-		}
-	}
-	*(saturnRing->position) = glm::rotate(*(saturnRing->position), orbitFactor / saturnRing->orbitSpeed, glm::vec3(0, 1, 0));
-	*(saturnRing->rotationMatrix) = glm::rotate(*(saturnRing->rotationMatrix), rotFactor / saturnRing->rotSpeed, glm::vec3(0, 1, 0));
-	for (int i = 0; i < pointLightsCount; i++) {
-		pointLights[i].position = glm::rotate(pointLights[i].position, 0.2f, glm::vec3(0, 1, 0));
-	}
+
 }
 //--------------------------------------------------------------------------------------------
 // kontrola naciskania klawiszy klawiatury
@@ -324,7 +236,6 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 		*movementSensitivity; break; } //D
 
 	case 32: {
-		SaveAsBmp("elo.bmp");
 		break;
 	}
 	}
@@ -375,64 +286,6 @@ void Scene::LMBClicked(int x, int y) {
 	float dummy = readMouseClickObj(x, y);
 }
 //--------------------------------------------------------------------------------------------
-void Scene::SaveAsBmp(char *filename)
-{
-	int _width = this->width;      // bitmap height 
-	int _height = this->height;    // bitmap width
-	while (_width * 3 % 4) _width--;  // adjust bmp width to meet 4B row padding rule
-	int img_size = _width*_height * 3; // image size (each pixel is coded by 3Bytes)
-
-	int storage_4B; // four byte storage used for saving integer bytes into bmp file 	
-	FILE *fil; // prepare file handle
-	fopen_s(&fil, filename, "wb"); // open the file in binary mode
-	rewind(fil);
-	//*********************** START OF THE HEADER **********************************
-	// BM signature
-	storage_4B = 0x00004d42; fwrite((char *)&storage_4B, 1, 2, fil);
-	// file size
-	storage_4B = 54 + img_size; fwrite((char *)&storage_4B, 1, 4, fil);
-	// four empty bytes 
-	storage_4B = 0;  fwrite((char *)&storage_4B, 1, 4, fil);
-	// pixeltable address
-	storage_4B = 0x00000036;  fwrite((char *)&storage_4B, 1, 4, fil);
-	//bytes in the header
-	storage_4B = 0x00000028;  fwrite((char *)&storage_4B, 1, 4, fil);
-	//width
-	storage_4B = _width; fwrite((char *)&storage_4B, 1, 4, fil);
-	//height
-	storage_4B = _height; fwrite((char *)&storage_4B, 1, 4, fil);
-	//color panes
-	storage_4B = 1; fwrite((char *)&storage_4B, 1, 2, fil);
-	//bits per pixel
-	storage_4B = 24; fwrite((char *)&storage_4B, 1, 2, fil);
-	//R_RGB
-	storage_4B = 0; fwrite((char *)&storage_4B, 1, 4, fil);
-	//RAW
-	storage_4B = img_size; fwrite((char *)&storage_4B, 1, 4, fil);
-	//hor res
-	storage_4B = 2835; fwrite((char *)&storage_4B, 1, 4, fil);
-	//ver res
-	storage_4B = 2835; fwrite((char *)&storage_4B, 1, 4, fil);
-	//palette colors
-	storage_4B = 0; fwrite((char *)&storage_4B, 1, 4, fil);
-	//important colors
-	storage_4B = 0; fwrite((char *)&storage_4B, 1, 4, fil);
-
-	//*********************** END OF THE HEADER **********************************
-
-	unsigned char *pixels; // room for pixeltable
-	pixels = (unsigned char *)malloc(img_size * sizeof(unsigned char));
-	// read pixels from colorbuffer
-	glReadPixels(0, 0, _width, _height, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
-	// store pixels in the file
-	fwrite(pixels, 1, img_size, fil);
-	fflush(fil); // clear file cache
-	fclose(fil); // close the file
-	free(pixels); // release memory
-
-
-}
-//--------------------------------------------------------------------------------------------
 // rysuje scene OpenGL 
 void Scene::DrawPicking() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -449,7 +302,7 @@ void Scene::DrawPicking() {
 	pickingShader->setMat4("projection", projection);
 	pickingShader->setMat4("view", view);
 
-	DrawSun(pickingShader);
+	DrawLamp(pickingShader);
 	renderScene(pickingShader);
 }
 
@@ -457,45 +310,41 @@ void Scene::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 0, 0, 1.0f);
-	if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
+	//if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
 
-	//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	renderShadowMaps();
-	
+	////glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	//renderShadowMaps();
+	//
 
-	// ustaw macierz projekcji na perspektywiczna
-	defaultShader->use();
-	for (int i = 0; i < pointLightsCount; i++) {
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].position", getGlobalPos(celestrials[Earth])+pointLights[i].position);
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
-		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
-		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
-		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
-	}
-	for (int i = 0; i < pointLightsCount; i++) {
-		*toast->position = pointLights[i].position;
-		RenderDrawable(defaultShader, toast);
-	}
+	//// ustaw macierz projekcji na perspektywiczna
+	//defaultShader->use();
+	//for (int i = 0; i < pointLightsCount; i++) {
+	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
+	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
+	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
+	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
+	//	defaultShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
+	//	defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
+	//	defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
+	//}
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-	
+	//
 	glm::vec3 eyePos = getGlobalPos(cameraParent);
 	eyePos += cameraPosition;
 
 	glm::mat4 view = glm::lookAt(eyePos,
 		eyePos + cameraDirection,
 		glm::vec3(0.0f, 1.0f, 0.0f));
-	defaultShader->setMat4("projection", projection);
-	defaultShader->setMat4("view", view);
+	//defaultShader->setMat4("projection", projection);
+	//defaultShader->setMat4("view", view);
 
-	// set lighting uniforms
-	defaultShader->setVec3("lightPos", lightPos);
-	defaultShader->setVec3("viewPos", eyePos);
-	defaultShader->setFloat("far_plane", far_plane);
-	
-	DrawSun(defaultShader);
-	renderScene(defaultShader);
+	//// set lighting uniforms
+	//defaultShader->setVec3("lightPos", lightPos);
+	//defaultShader->setVec3("viewPos", eyePos);
+	//defaultShader->setFloat("far_plane", far_plane);
+	//
+	//DrawLamp(defaultShader);
+	//renderScene(defaultShader);
 
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
 
@@ -535,9 +384,9 @@ void Scene::Draw()
 	glDisable(GL_BLEND);*/
 }
 
-void Scene::DrawSun(Shader* shader) {
+void Scene::DrawLamp(Shader* shader) {
 
-	shader->use();
+	/*shader->use();
 	defaultShader->setInt("shadows", -1);
 	glm::mat4 mTransform = glm::mat4(1);
 	mTransform = (*celestrials[Sun]->rotationMatrix) * mTransform;
@@ -554,7 +403,7 @@ void Scene::DrawSun(Shader* shader) {
 
 	shader->setInt("gObjectIndex", celestrials[Sun]->ID);
 	celestrials[Sun]->Draw();
-	defaultShader->setInt("shadows", 1);
+	defaultShader->setInt("shadows", 1);*/
 
 }
 
@@ -589,14 +438,9 @@ void Scene::renderShadowMaps() {
 
 void Scene::renderScene(Shader* shader) {
 
-	for (int i = 1; i < celestrialsCount; i++) {
-		RenderDrawable(shader, celestrials[i]);
+	for (int i = 1; i < meshObjects.size(); i++) {
+		RenderDrawable(shader, meshObjects[i]);
 	}
-	for (int i = 0; i < satellitesCount; i++) {
-		RenderDrawable(shader, satellites[i]);
-	}
-
-	RenderDrawable(shader, saturnRing);
 }
 
 void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
@@ -656,35 +500,13 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 }
 
 void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
-	if(toDraw==celestrials[Uranus]||toDraw==celestrials[Neptune])
-		shader->setInt("shadows", 0);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
 	TransformAndDraw(shader, toDraw);
-	if (glSphere* planet = dynamic_cast<glSphere*>(toDraw)) {
-		float initScale = planet->scale;
-		if (planet->hasAtmo) {
-			planet->scale = initScale + initScale*0.02f;
-			glm::mat4* initRot = planet->rotationMatrix;
-			planet->rotationMatrix = planet->atmoRot[0];
-			shader->setInt("isAtmo", 1);
-			shader->setVec3("atmoColor", *(planet->atmoColor));
+	glDisable(GL_BLEND);
 
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glBlendEquation(GL_FUNC_ADD);
-			TransformAndDraw(shader, planet);
-			planet->rotationMatrix = planet->atmoRot[1];
-			planet->scale = initScale + initScale*0.05f;
-			TransformAndDraw(shader, planet);
-			glDisable(GL_BLEND);
-
-			shader->setInt("isAtmo", 0);
-			shader->setVec3("atmoColor", glm::vec3(0));
-			planet->rotationMatrix = initRot;
-			planet->scale = initScale;
-		}
-	}
-	if (toDraw == celestrials[Uranus] || toDraw == celestrials[Neptune])
-		shader->setInt("shadows", 1);
 }
 
 float Scene::readMouseClickObj(int x, int y) {
@@ -697,18 +519,10 @@ float Scene::readMouseClickObj(int x, int y) {
 	
 	if (Pixel[0] != 0) {
 		Drawable* clicked = NULL;
-		for (int i = 0; i < celestrialsCount; i++) {
-			if (celestrials[i]->ID == Pixel[0]) {
-				clicked = celestrials[i];
+		for (int i = 0; i < meshObjects.size(); i++) {
+			if (meshObjects[i]->ID == Pixel[0]) {
+				clicked = meshObjects[i];
 				break;
-			}
-		}
-		if (!clicked) {
-			for (int i = 0; i < satellitesCount; i++) {
-				if (satellites[i]->ID == Pixel[0]) {
-					clicked = satellites[i];
-					break;
-				}
 			}
 		}
 		if (!clicked) return 0;

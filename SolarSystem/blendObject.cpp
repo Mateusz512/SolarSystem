@@ -1,10 +1,10 @@
 #include "blendObject.h"
 
-blendObject::blendObject()
+meshObject::meshObject()
 {
 }
 
-blendObject::blendObject(char* filename, 
+meshObject::meshObject(char* filename, 
 	char* diffuseTexture, 
 	char* specularTexture, 
 	char* normalTexture, 
@@ -16,11 +16,11 @@ blendObject::blendObject(char* filename,
 }
 
 
-blendObject::~blendObject()
+meshObject::~meshObject()
 {
 }
 
-void blendObject::Draw()
+void meshObject::Draw()
 {
 	// Bind our texture in Texture Unit 0
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
@@ -58,7 +58,7 @@ void blendObject::Draw()
 
 
 
-void blendObject::Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) {
+void meshObject::Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) {
 
 	if (diffuseTexture != NULL && std::experimental::filesystem::exists(diffuseTexture))
 		textures[Diffuse] = new glTexture(diffuseTexture);
@@ -187,7 +187,7 @@ void blendObject::Load(char* filename, char* diffuseTexture, char* specularTextu
 	}
 }
 
-void blendObject::ReadFromFile(char * filename,
+void meshObject::ReadFromFile(char * filename,
 	std::vector < glm::vec3 > & out_vertices,
 	std::vector < glm::vec2 > & out_uvs,
 	std::vector < glm::vec3 > & out_normals)
@@ -261,7 +261,7 @@ void blendObject::ReadFromFile(char * filename,
 	}
 }
 
-void blendObject::PrepareInstancesMatrices() {
+void meshObject::PrepareInstancesMatrices() {
 	modelMatrices = new glm::mat4[instancesCount];
 	srand(1337); // initialize random seed	
 	float radius = 25.0;

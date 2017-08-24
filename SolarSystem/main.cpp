@@ -334,10 +334,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 			MessageBox(0,e,"Wystapi³ wyj¹tek",0);
 	}
-	catch(...) // unhandled exceptions
+	catch(std::exception e) // unhandled exceptions
 	{	
 			KillGLWindow(); // usun zasoby okna 
-			if (SC) delete SC;
 	}
 
 	KillTimer(hWnd,IDT_TIMER);

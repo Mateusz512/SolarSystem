@@ -5,7 +5,7 @@
 glSphere::glSphere(float R, char* diffuseTexture, 
 	char* specularTexture, char* normalTexture, 
 	char* extraTexture, glm::vec3 atmoColor) 
-		: blendObject("objects\\sphere.obj", 
+		: meshObject("objects\\sphere.obj", 
 		diffuseTexture, specularTexture, normalTexture, extraTexture)
 {
 	this->scale = R;
@@ -27,6 +27,6 @@ glSphere::~glSphere()
 //--------------------------------------------------------------------------------------------
 void glSphere::Draw()
 {
-	blendObject::Draw();	
+	meshObject::Draw();	
 }
 // the end 

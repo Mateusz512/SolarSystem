@@ -16,17 +16,17 @@
 #define TEXCOORD_VB  3    
 #define MODEL_MAT_VB   4
 
-class blendObject: public Drawable
+class meshObject: public Drawable
 {
 public:
-	blendObject();
-	blendObject(char * filename, 
+	meshObject();
+	meshObject(char * filename, 
 		char * diffuseTexture, 
 		char * specularTexture, 
 		char * normalTexture, 
 		char * extraTexture, 
 		int instancesCount=0);	
-	~blendObject();
+	~meshObject();
 	void Draw();
 
 protected:

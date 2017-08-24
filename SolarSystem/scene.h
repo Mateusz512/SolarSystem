@@ -14,7 +14,6 @@
 #include "common.h"
 #include "globject.h"
 #include "printer.h"
-#include "sphere.h"
 #include "texture.h"
 #include "blendObject.h"
 #include "shader.h"
@@ -58,7 +57,7 @@ void Draw(); // rysuje zawartosc sceny
 
 void DrawPicking();
 
-void DrawSun(Shader* shader);
+void DrawLamp(Shader* shader);
 
 void renderShadowMaps();
 
@@ -67,10 +66,6 @@ void renderScene(Shader * shader);
 void TransformAndDraw(Shader * shader, Drawable * toDraw);
 
 void RenderDrawable(Shader* shader, Drawable* toDraw);
-
-/*void PreparePickingBuffer();
-
-void RenderPickingBuffer();*/
 
 float readMouseClickObj(int x, int y);
 
@@ -87,48 +82,20 @@ void MouseRolled(int dir);
 void LMBClicked(int x, int y);
 bool isFirstMouseMovement = true;
 
-void SaveAsBmp(char *filename);
-
-//GLuint LoadShader(GLenum type,const char *file_name); // laduje program shadera z zewnetrznego pliku 
-
 private:
-
-bool glewOK = false;
 
 float LightAmbient;
 
-float mouseSensitivity = 0.2;
-float movementSensitivity = 0.3;
-
-blendObject *test;
-blendObject *plane;
-blendObject *toast;
-blendObject **satellites;
-int satellitesCount;
-//blendObject *satellite0;
-//blendObject *satellite1;
-//blendObject *satellite2;
-
-blendObject *saturnRing;
-blendObject *asteroidField;
-
-//glSphere* moon;
-//glSphere* earth;
-
-glSphere** celestrials;
-unsigned const short celestrialsCount = 10;
-glSphere* prepareCelestrial(float size, std::string name, 
-	glm::vec3 atmoColor, 
-	Drawable* parent, 
-	glm::vec3 pos, float rotSpeed, float orbitSpeed);
+float mouseSensitivity = 0.17f;
+float movementSensitivity = 0.28f;
 
 glPrinter *Prn;
 
+std::string imie = "Bartek";
 
-std::string imie = "Mateusz";
-
-//void PreparePrograms(); // przygotowuje programy przetwarzania 
 void PrepareObjects(); // przygotowuje obiekty do wyswietlenia 
+
+meshObject * newMeshObject(std::string name, glm::vec3 pos);
 
 // rozmiary sceny 
 int width;
@@ -153,7 +120,7 @@ Shader* pickingShader;
 
 Skybox* skybox;
 
-const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
+const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 unsigned int depthCubemap;
 unsigned int depthMapFBO;
 
@@ -169,14 +136,10 @@ glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, -0.1, -1));
 glm::vec2 currentMousePosition = glm::vec2(0, 0);
 glm::vec2 previousMousePosition = glm::vec2(0, 0);
 
-float orbitFactor;
-float rotFactor;
-
 static const int pointLightsCount = 10;
 PointLight pointLights[pointLightsCount];
-/*GLuint pickingFBO;
-GLuint pickingPrimitiveTexture;
-GLuint pickingDepthTexture;*/
+
+std::vector<meshObject*> meshObjects;
 };
 
 #endif

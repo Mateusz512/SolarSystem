@@ -30,7 +30,7 @@ public:
 	float orbitSpeed;
 	float rotSpeed;
 	glm::mat4* rotationMatrix;
-	glm::vec3* inclination;			/// TODO: Implement inclination
+	glm::vec3* inclination;			
 	float scale = 1.0f;
 		
 	void setOrbitInfo(Drawable* parent, glm::vec3 pos, float orbitSpeed, float rotSpeed) {
