@@ -313,20 +313,20 @@ void Scene::Draw()
 	//if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
 
 	////glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	//renderShadowMaps();
-	//
+	renderShadowMaps();
+	
 
-	//// ustaw macierz projekcji na perspektywiczna
-	//defaultShader->use();
-	//for (int i = 0; i < pointLightsCount; i++) {
-	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
-	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
-	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
-	//	defaultShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
-	//	defaultShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
-	//	defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
-	//	defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
-	//}
+	// ustaw macierz projekcji na perspektywiczna
+	defaultShader->use();
+	for (int i = 0; i < pointLightsCount; i++) {
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
+		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
+		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
+		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
+		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
+	}
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
 	//
 	glm::vec3 eyePos = getGlobalPos(cameraParent);
@@ -335,16 +335,16 @@ void Scene::Draw()
 	glm::mat4 view = glm::lookAt(eyePos,
 		eyePos + cameraDirection,
 		glm::vec3(0.0f, 1.0f, 0.0f));
-	//defaultShader->setMat4("projection", projection);
-	//defaultShader->setMat4("view", view);
+	defaultShader->setMat4("projection", projection);
+	defaultShader->setMat4("view", view);
 
-	//// set lighting uniforms
-	//defaultShader->setVec3("lightPos", lightPos);
-	//defaultShader->setVec3("viewPos", eyePos);
-	//defaultShader->setFloat("far_plane", far_plane);
-	//
-	//DrawLamp(defaultShader);
-	//renderScene(defaultShader);
+	// set lighting uniforms
+	defaultShader->setVec3("lightPos", lightPos);
+	defaultShader->setVec3("viewPos", eyePos);
+	defaultShader->setFloat("far_plane", far_plane);
+	
+	DrawLamp(defaultShader);
+	renderScene(defaultShader);
 
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
 
@@ -438,7 +438,7 @@ void Scene::renderShadowMaps() {
 
 void Scene::renderScene(Shader* shader) {
 
-	for (int i = 1; i < meshObjects.size(); i++) {
+	for (int i = 0; i < meshObjects.size(); i++) {
 		RenderDrawable(shader, meshObjects[i]);
 	}
 }
