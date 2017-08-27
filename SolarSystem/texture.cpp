@@ -69,7 +69,7 @@ unsigned int glTexture::loadTexture(char * path)
 	}
 	else
 	{
-		//TODO: DIDN'T LOAD IMAGE
+		///TODO: DIDN'T LOAD IMAGE
 		stbi_image_free(data);
 	}
 

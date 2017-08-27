@@ -1,0 +1,13 @@
+# Blender MTL File: 'projekt.blend'
+# Material Count: 1
+
+newmtl _1___Default
+Ns 3.921569
+Ka 0.588235 0.588235 0.588235
+Kd 0.588235 0.588235 0.588235
+Ks 0.898039 0.898039 0.898039
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Math\Desktop\starotsta\chair low poly\chair_obj\CHAIR.TGA

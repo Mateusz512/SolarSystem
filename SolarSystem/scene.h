@@ -120,14 +120,14 @@ Shader* pickingShader;
 
 Skybox* skybox;
 
-const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 unsigned int depthCubemap;
 unsigned int depthMapFBO;
 
 float near_plane = 0.1f;
 float far_plane = 400.0f;
 
-glm::vec3 lightPos = glm::vec3(0,0,0);
+glm::vec3 lightPos = glm::vec3(0,3,10);
 glm::vec3 cameraPosition = glm::vec3(5, 0, 5);
 Drawable* cameraParent;
 float cameraAngle = 45.0f;

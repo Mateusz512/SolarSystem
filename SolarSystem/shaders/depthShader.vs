@@ -7,8 +7,7 @@ uniform mat4 normalMatrix;
 
 void main()
 {
-    //gl_Position = model * vec4(aPos, 1.0);
-	if(gl_InstanceID != 0){		
+    if(gl_InstanceID != 0){		
 		gl_Position = model * instanceModel *  vec4(aPos, 1.0);
 	}else{
 		gl_Position = model * vec4(aPos, 1.0);	

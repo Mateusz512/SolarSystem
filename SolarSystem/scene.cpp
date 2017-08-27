@@ -43,69 +43,12 @@ Scene::~Scene()
 //--------------------------------------------------------------------------------------------
 void Scene::PrepareObjects()
 {
-	//meshObjects.push_back(new meshObject())
-	//celestrials = new glSphere*[celestrialsCount];
-	//celestrials[Sun] = prepareCelestrial(0.3f, "sun", glm::vec3(0), NULL, glm::vec3(0), 1, 0.02f);
-	//celestrials[Mercury] = prepareCelestrial(0.3829f, "mercury", glm::vec3(0), celestrials[Sun], glm::vec3(0.39f,0,0)*x, 58.64f, 0.24f);
-	//celestrials[Venus] = prepareCelestrial(0.9499f, "venus", glm::vec3(1), celestrials[Sun], glm::vec3(0.62f, 0, 0)*x, -243.02f, 0.62f);
-	//celestrials[Earth] = prepareCelestrial(1.0f, "earth", glm::vec3(1), celestrials[Sun], glm::vec3(1.2, 0, 0)*x, 1.0f, 1.0f);
-	//celestrials[Moon] = prepareCelestrial(0.2f, "moon", glm::vec3(0), celestrials[Earth], glm::vec3(3, 0, 0), -1.0f, 1.0f);
-	//celestrials[Mars] = prepareCelestrial(0.5320f, "mars", glm::vec3(0.7,0.2,0.2), celestrials[Sun], glm::vec3(1.9f, 0, 0)*x, 1.03f, 1.88f);
-	//celestrials[Jupiter] = prepareCelestrial(10.97f, "jupiter", glm::vec3(0), celestrials[Sun], glm::vec3(5.2f, 0, 0)*x, 0.41f, 11.86f);
-	//celestrials[Saturn] = prepareCelestrial(9.140f, "saturn", glm::vec3(0), celestrials[Sun], glm::vec3(9.54f, 0, 0)*x, 0.43f, 29.46f);
-	//celestrials[Uranus] = prepareCelestrial(3.981f, "uranus", glm::vec3(0), celestrials[Sun], glm::vec3(19.22f, 0, 0)*x, -0.72f, 84.01f);
-	//celestrials[Neptune] = prepareCelestrial(3.865f, "neptune", glm::vec3(0), celestrials[Sun], glm::vec3(30.06f, 0, 0)*x, 0.67f, 167.8f);
-	////celestrials[Moon] = prepareCelestrial(0.5f, "moon", glm::vec3(0), celestrials[1], glm::vec3(2,0,0), 0.2f, 0.1f);
-
-	//saturnRing = new meshObject("objects\\rock.obj", "textures\\rock.jpg" , NULL, NULL, NULL, 10000);
-	//saturnRing->setOrbitInfo(celestrials[Saturn], glm::vec3(0, 0, 0), 0.41f, 11.86f);
-
-	//toast = new meshObject("objects\\toast.obj", "textures\\toast.jpg", NULL, NULL, NULL);
-	//toast->scale = 0.02;
-	//toast->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
-
-	//satellitesCount = 12;
-	//satellites = new meshObject*[satellitesCount];
-	//satellites[0] = new meshObject("objects\\SpaceShip2.obj", "textures\\SpaceShip2.jpg", NULL, NULL, NULL);
-	//satellites[0]->scale = 0.1;
-	//satellites[0]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 0), 0.41f, 11.86f);
-	//satellites[1] = new meshObject("objects\\SpaceShip3.obj", "textures\\SpaceShip3.jpg", NULL, NULL, NULL);
-	//satellites[1]->scale = 0.1;
-	//satellites[1]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, 1), 0.41f, 11.86f);
-	//satellites[2] = new meshObject("objects\\hst.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	//satellites[2]->scale = 0.1;
-	//satellites[2]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, 2), 0.41f, 11.86f);
-	//satellites[3] = new meshObject("objects\\SpaceShip.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	//satellites[3]->scale = 0.1;
-	//satellites[3]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, 2), 0.41f, 11.86f);
-	//satellites[4] = new meshObject("objects\\SpaceShip4.obj", "textures\\SpaceShip4.jpg", NULL, NULL, NULL);
-	//satellites[4]->scale = 0.05;
-	//satellites[4]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 0), 0.41f, 11.86f);
-	//satellites[5] = new meshObject("objects\\SpaceShip5.obj", "textures\\SpaceShip5.jpg", NULL, NULL, NULL);
-	//satellites[5]->scale = 0.05;
-	//satellites[5]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, -1), 0.41f, 11.86f);
-	//satellites[6] = new meshObject("objects\\SpaceShip6.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	//satellites[6]->scale = 0.2;
-	//satellites[6]->setOrbitInfo(celestrials[Earth], glm::vec3(-2, 0, 1), 0.41f, 11.86f);
-	//satellites[7] = new meshObject("objects\\SpaceShip7.obj", "textures\\SpaceShip7.jpg", NULL, NULL, NULL);
-	//satellites[7]->scale = 0.2;
-	//satellites[7]->setOrbitInfo(celestrials[Earth], glm::vec3(-1, 0, 2), 0.41f, 11.86f);
-	//satellites[8] = new meshObject("objects\\SpaceShip8.obj", "textures\\universalTexturef.jpg", NULL, NULL, NULL);
-	//satellites[8]->scale = 0.3;
-	//satellites[8]->setOrbitInfo(celestrials[Earth], glm::vec3(2, 0, -1), 0.41f, 11.86f);
-	//satellites[9] = new meshObject("objects\\SpaceShip9.obj", "textures\\SpaceShip9.jpg", NULL, NULL, NULL);
-	//satellites[9]->scale = 0.3;
-	//satellites[9]->setOrbitInfo(celestrials[Earth], glm::vec3(0, 0, -2), 0.41f, 11.86f);
-	//satellites[10] = new meshObject("objects\\SpaceShip10.obj", "textures\\SpaceShip10.jpg", NULL, NULL, NULL);
-	//satellites[10]->scale = 0.3;
-	//satellites[10]->setOrbitInfo(celestrials[Earth], glm::vec3(-1.2, 0, -2), 0.41f, 11.86f);
-	//satellites[11] = new meshObject("objects\\SpaceShip11.obj", "textures\\SpaceShip11.jpg", NULL, NULL, NULL);
-	//satellites[11]->scale = 0.3;
-	//satellites[11]->setOrbitInfo(celestrials[Earth], glm::vec3(1, 0, -2), 0.41f, 11.86f);
-
-	meshObjects.push_back(newMeshObject("moon", glm::vec3(0, 1, 0)));
+	meshObjects.push_back(newMeshObject("floor", glm::vec3(0, 0, 0)));
+	meshObjects.push_back(newMeshObject("wall", glm::vec3(0, 0, 0)));
+	meshObjects.push_back(newMeshObject("ceiling", glm::vec3(0, 0, 0)));	
+	meshObjects.push_back(newMeshObject("chair", glm::vec3(4, 0, 4)));
+	meshObjects.push_back(newMeshObject("chair1", glm::vec3(4, 0,-4)));
 	cameraParent = meshObjects[0];
-
 }
 
 meshObject* Scene::newMeshObject(std::string name, glm::vec3 pos) {
@@ -154,12 +97,7 @@ void Scene::Init()
 	// przygotuj obiekty do wyswietlenia 
 	PrepareObjects();
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-
-	/*glGenFramebuffers(1, &pickingFBO);
-	glGenTextures(1, &pickingDepthTexture);
-	PreparePickingBuffer();*/
-
+	
 	// configure depth map FBO
 	// -----------------------
 	glGenFramebuffers(1, &depthMapFBO);
@@ -186,7 +124,7 @@ void Scene::Init()
 
 	srand(static_cast <unsigned> (time(0)));
 	for (int i = 0; i < pointLightsCount; i++) {
-		pointLights[i].position = glm::rotate(glm::vec3(3, 0, 0), 36.0f * i, glm::vec3(0, 1, 0));
+		pointLights[i].position = glm::rotate(glm::vec3(3, 5, 0), 36.0f * i, glm::vec3(0, 1, 0));
 		pointLights[i].ambient = glm::vec3(
 			random(0.01f,0.05f), random(0.01f, 0.05f), random(0.01f, 0.05f)); 
 		pointLights[i].diffuse = glm::vec3(
@@ -194,9 +132,10 @@ void Scene::Init()
 		pointLights[i].specular = glm::vec3(
 			random(0.5f, 1.0f), random(0.5f, 1.0f), random(0.5f, 1.0f));
 		pointLights[i].constant=1.0f;
-		pointLights[i].linear=0.09f;
-		pointLights[i].quadratic=0.032f;
+		pointLights[i].linear=0.35f;
+		pointLights[i].quadratic=0.44f;
 	}
+
 }
 
 //--------------------------------------------------------------------------------------------
@@ -302,7 +241,7 @@ void Scene::DrawPicking() {
 	pickingShader->setMat4("projection", projection);
 	pickingShader->setMat4("view", view);
 
-	DrawLamp(pickingShader);
+	//DrawLamp(pickingShader);
 	renderScene(pickingShader);
 }
 
@@ -313,7 +252,10 @@ void Scene::Draw()
 	//if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
 
 	////glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
 	renderShadowMaps();
+	glCullFace(GL_BACK);
 	
 
 	// ustaw macierz projekcji na perspektywiczna
@@ -501,16 +443,16 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 
 void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendEquation(GL_FUNC_ADD);
+	defaultShader->setInt("shadows", 1); 
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendEquation(GL_FUNC_ADD);
 	TransformAndDraw(shader, toDraw);
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 
 }
 
 float Scene::readMouseClickObj(int x, int y) {
-
 	unsigned char Pixel[4];
 	GLint viewport[4];
 
@@ -518,7 +460,7 @@ float Scene::readMouseClickObj(int x, int y) {
 	glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &Pixel);
 	
 	if (Pixel[0] != 0) {
-		Drawable* clicked = NULL;
+		meshObject* clicked = NULL;
 		for (int i = 0; i < meshObjects.size(); i++) {
 			if (meshObjects[i]->ID == Pixel[0]) {
 				clicked = meshObjects[i];
@@ -526,16 +468,12 @@ float Scene::readMouseClickObj(int x, int y) {
 			}
 		}
 		if (!clicked) return 0;
-		if (clicked == cameraParent) {
-			cameraPosition *= 4 * cameraParent->scale / glm::length(cameraPosition);
-			cameraDirection = glm::normalize(cameraPosition)*-1.0f;
-			return 0;
-		}
 		glm::vec3 pos =	getGlobalPos(cameraParent);
 		cameraParent = clicked;
 		glm::vec3 npos = getGlobalPos(clicked);
 		cameraPosition = pos + cameraPosition - npos;
-		//cameraDirection = glm::normalize(glm::vec3(-1, -0.1f, -1));
+		cameraPosition *= 4 * cameraParent->scale / glm::length(cameraPosition);
+		cameraDirection = glm::normalize(cameraPosition)*-1.0f;
 		return Pixel[0];
 	}
 	return Pixel[0];

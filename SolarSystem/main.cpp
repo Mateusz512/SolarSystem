@@ -274,7 +274,7 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 				GetWindowRect(hWnd, &rect);
 				SC->DrawPicking();
 				SC->LMBClicked(currentX-rect.left, currentY-rect.top-30);
-				//SwapBuffers(hDC);			
+				SwapBuffers(hDC);			
 			}			
 			return 0;
 		}

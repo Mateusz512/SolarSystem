@@ -11,6 +11,7 @@ meshObject::meshObject(char* filename,
 	char* extraTexture, 
 	int instancesCount) : Drawable()
 {
+	this->name = filename;
 	this->instancesCount = instancesCount;
 	Load(filename, diffuseTexture, specularTexture, normalTexture, extraTexture);
 }

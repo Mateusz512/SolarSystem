@@ -30,7 +30,7 @@ public:
 	void Draw();
 
 protected:
-
+	char* name;
 	glm::mat4 * modelMatrices;
 	int instancesCount=0;
 
