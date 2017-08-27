@@ -19,7 +19,7 @@ in VS_OUT {
     vec2 TexCoords;
 } fs_in;
 
-#define NR_POINT_LIGHTS 10
+#define NR_POINT_LIGHTS 1
 
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform sampler2D diffuseTexture;
@@ -65,9 +65,18 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float distance = length(light.position - fragPos);
     float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     // combine results
-    vec3 ambient = light.ambient * vec3(texture(diffuseTexture, 1.0f - fs_in.TexCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, 1.0f - fs_in.TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(diffuseTexture, 1.0f - fs_in.TexCoords));
+    vec3 ambient = light.ambient; 
+	//* vec3(texture(diffuseTexture, 1.0f - fs_in.TexCoords));
+    vec3 diffuse = light.diffuse * diff; 
+	//* diff * vec3(texture(diffuseTexture, 1.0f - fs_in.TexCoords));
+	vec3 specular;
+	if( EnableSpecularTexture == 1 ){
+		specular = light.specular * spec * vec3(texture(specularTexture, fs_in.TexCoords * vec2(1.0, -1.0))); 
+	}else{
+		specular = light.specular * spec; 
+	
+	}
+	//* spec * vec3(texture(diffuseTexture, 1.0f - fs_in.TexCoords));
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
@@ -108,17 +117,9 @@ void main()
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 normal = normalize(fs_in.Normal);
-	if( isAtmo == 1 ){
-		if( EnableExtraTexture == 1 ){
-			color = texture(extraTexture, 1.0f - fs_in.TexCoords).rgb ;
-		}else{			
-			color = atmoColor;
-		}
-	}else{
-		color = texture(diffuseTexture, 1.0f - fs_in.TexCoords).rgb;	
-		for(int i = 0; i < NR_POINT_LIGHTS; i++){
-			randomness += vec4(CalcPointLight(pointLights[i], normal, fs_in.FragPos, viewDir),1.0);    	
-		}
+	color = texture(diffuseTexture, fs_in.TexCoords * vec2(1.0, -1.0) ).rgb;	
+	for(int i = 0; i < NR_POINT_LIGHTS; i++){
+		randomness += vec4(CalcPointLight(pointLights[i], normal, fs_in.FragPos, viewDir),1.0);    	
 	}
     vec3 lightColor = vec3(0.4);
     // ambient
@@ -132,10 +133,10 @@ void main()
     float spec = 0.0;
 	vec3 specular;
 	vec3 halfwayDir = normalize(lightDir + viewDir);  
-	spec = pow(max(dot(normal, halfwayDir), 0.0), 8.0);
-	if( isAtmo == 0 && EnableSpecularTexture == 1  ){
+	spec = pow(max(dot(normal, halfwayDir), 0.0), 128.0);
+	if( EnableSpecularTexture == 1 ){
 		//FragColor = vec4(texture(specularTexture, 1.0f - fs_in.TexCoords).rgb, 1.0f);
-		specular = 3 *  spec * vec3(texture(specularTexture, 1.0f - fs_in.TexCoords));
+		specular = 3 *  spec * vec3(texture(specularTexture, fs_in.TexCoords * vec2(1.0, -1.0)));
 	}else{
 		//FragColor = vec4(1,0,0, 1.0f);
 		specular = spec * lightColor;
@@ -154,5 +155,5 @@ void main()
 		result = vec4(lighting, 0.2f);
 	}
 	result+=randomness;
-	FragColor = vec4(result.xyz,0.2);
+	FragColor = vec4(result.xyz,1);
 }
