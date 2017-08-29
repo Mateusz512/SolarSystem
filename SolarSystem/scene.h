@@ -128,8 +128,7 @@ float near_plane = 0.1f;
 float far_plane = 400.0f;
 
 glm::vec3 lightPos = glm::vec3(0,3,10);
-glm::vec3 cameraPosition = glm::vec3(5, 0, 5);
-Drawable* cameraParent;
+glm::vec3 cameraPosition = glm::vec3(5, 1.92, 5);
 float cameraAngle = 45.0f;
 glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, -0.1, -1));
 

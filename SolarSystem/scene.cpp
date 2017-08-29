@@ -48,7 +48,6 @@ void Scene::PrepareObjects()
 	meshObjects.push_back(newMeshObject("ceiling", glm::vec3(0, 0, 0)));	
 	meshObjects.push_back(newMeshObject("chair", glm::vec3(4, 0, 4)));
 	meshObjects.push_back(newMeshObject("chair1", glm::vec3(4, 0,-4)));
-	cameraParent = meshObjects[0];
 }
 
 meshObject* Scene::newMeshObject(std::string name, glm::vec3 pos) {
@@ -151,32 +150,28 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 	if (key == ESCAPE) ThrowException("Zatrzymaj program");
 	switch (key)
 	{
-	case 37: { break; }
-	case 38: { break; }
-	case 39: { break; }
-	case 40: { break; }
-	case 86: { break; } //T
-	case 69: { cameraPosition *= 4*cameraParent->scale/glm::length(cameraPosition); } //E
-	case 82: { cameraDirection = glm::normalize(cameraPosition)*-1.0f; break; } //R
-	case 112: {LightAmbient += 0.1f; break; } // F1		
-	case 113: {LightAmbient -= 0.1f; break; } //F2		
+		case 37: { break; } // LEFT
+		case 38: { break; } // UP
+		case 39: { break; } // RIGHT
+		case 40: { break; } // DOWN
+		case 86: { break; } //T
+		case 69: { break; } //E
+		case 82: { break; } //R
+		case 112: { LightAmbient += 0.1f; break; } // F1		
+		case 113: { LightAmbient -= 0.1f; break; } //F2		
 
-	case 114: { break; } //F3		
-	case 115: { break; } //F4		
+		case 114: { break; } //F3		
+		case 115: { break; } //F4		
 
-	case 116: { break; } //F5		
-	case 117: { break; } //F6		
+		case 116: { break; } //F5		
+		case 117: { break; } //F6		
 
-	case 87: {cameraPosition += cameraDirection*movementSensitivity; break; } //W
-	case 83: {cameraPosition -= cameraDirection*movementSensitivity; break; } //S		
-	case 65: {cameraPosition -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0)))
-		*movementSensitivity; break; } //A
-	case 68: {cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0)))
-		*movementSensitivity; break; } //D
+		case 87: { cameraPosition += cameraDirection * glm::vec3(1, 0, 1) * movementSensitivity; break; } //W
+		case 83: { cameraPosition -= cameraDirection * glm::vec3(1, 0, 1) * movementSensitivity; break; } //S		
+		case 65: { cameraPosition -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * movementSensitivity; break; } //A
+		case 68: { cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * movementSensitivity; break; } //D
 
-	case 32: {
-		break;
-	}
+		case 32: { break; }
 	}
 
 }
@@ -199,7 +194,7 @@ void Scene::MouseMoved(int x, int y, DraggingMode dr) {
 				*movementSensitivity * 0.2f * ((delta.y>0) ? -1.0f : 1.0f);
 			}
 			break;
-		case Right:
+		/*case Right:
 			if (abs(delta.x) > abs(delta.y)) {
 				cameraPosition = glm::rotate(cameraPosition, ((delta.x > 0) ? -1.0f : 1.0f)*3.0f , glm::vec3(0, 1, 0));
 				cameraDirection = glm::rotate(cameraDirection, ((delta.x > 0) ? -1.0f : 1.0f)*3.0f, glm::vec3(0, 1, 0));
@@ -208,7 +203,7 @@ void Scene::MouseMoved(int x, int y, DraggingMode dr) {
 				cameraPosition = glm::rotate(cameraPosition, ((delta.y < 0) ? -1.0f : 1.0f)*2.0f, glm::normalize(glm::cross(cameraPosition, glm::vec3(0, 1, 0))));
 				cameraDirection = glm::rotate(cameraDirection, ((delta.y < 0) ? -1.0f : 1.0f)*-2.0f, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))));
 			}
-			break;
+			break;*/
 	}
 	previousMousePosition.x = x; previousMousePosition.y = y;
 	isFirstMouseMovement = false;
@@ -230,13 +225,10 @@ void Scene::DrawPicking() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 0, 0, 1.0f);
 	pickingShader->use();
-
-	glm::vec3 eyePos = getGlobalPos(cameraParent);
-	eyePos += cameraPosition;
-
+	
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-	glm::mat4 view = glm::lookAt(eyePos,
-		eyePos + cameraDirection,
+	glm::mat4 view = glm::lookAt(cameraPosition,
+		cameraPosition + cameraDirection,
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	pickingShader->setMat4("projection", projection);
 	pickingShader->setMat4("view", view);
@@ -270,19 +262,16 @@ void Scene::Draw()
 		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
 	}
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-	//
-	glm::vec3 eyePos = getGlobalPos(cameraParent);
-	eyePos += cameraPosition;
-
-	glm::mat4 view = glm::lookAt(eyePos,
-		eyePos + cameraDirection,
+	
+	glm::mat4 view = glm::lookAt(cameraPosition,
+		cameraPosition + cameraDirection,
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	defaultShader->setMat4("projection", projection);
 	defaultShader->setMat4("view", view);
 
 	// set lighting uniforms
 	defaultShader->setVec3("lightPos", lightPos);
-	defaultShader->setVec3("viewPos", eyePos);
+	defaultShader->setVec3("viewPos", cameraPosition);
 	defaultShader->setFloat("far_plane", far_plane);
 	
 	DrawLamp(defaultShader);
@@ -459,7 +448,7 @@ float Scene::readMouseClickObj(int x, int y) {
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &Pixel);
 	
-	if (Pixel[0] != 0) {
+	if (Pixel[0] > 3) {
 		meshObject* clicked = NULL;
 		for (int i = 0; i < meshObjects.size(); i++) {
 			if (meshObjects[i]->ID == Pixel[0]) {
@@ -468,12 +457,12 @@ float Scene::readMouseClickObj(int x, int y) {
 			}
 		}
 		if (!clicked) return 0;
-		glm::vec3 pos =	getGlobalPos(cameraParent);
+		/*glm::vec3 pos = getGlobalPos(cameraParent);
 		cameraParent = clicked;
 		glm::vec3 npos = getGlobalPos(clicked);
 		cameraPosition = pos + cameraPosition - npos;
 		cameraPosition *= 4 * cameraParent->scale / glm::length(cameraPosition);
-		cameraDirection = glm::normalize(cameraPosition)*-1.0f;
+		cameraDirection = glm::normalize(cameraPosition)*-1.0f;*/
 		return Pixel[0];
 	}
 	return Pixel[0];
