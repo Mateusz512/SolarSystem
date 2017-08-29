@@ -28,6 +28,7 @@ public:
 		int instancesCount=0);	
 	~meshObject();
 	void Draw();
+	float radious = 0.0f;
 
 protected:
 	char* name;

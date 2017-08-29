@@ -205,6 +205,8 @@ void meshObject::ReadFromFile(char * filename,
 		std::string str = sstr.str();
 		ThrowException(&str);
 	}
+	glm::vec2 max = glm::vec2(0, 0);
+	glm::vec2 cur = glm::vec2(0, 0);
 
 	while (1) {
 
@@ -239,6 +241,12 @@ void meshObject::ReadFromFile(char * filename,
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
+			cur.x = vertexIndex[0];
+			cur.y = vertexIndex[2];
+			if (glm::length(max) > glm::length(cur)) {
+				max.x = cur.x;
+				max.y = cur.y;
+			}
 			uvIndices.push_back(uvIndex[0]);
 			uvIndices.push_back(uvIndex[1]);
 			uvIndices.push_back(uvIndex[2]);
@@ -260,6 +268,7 @@ void meshObject::ReadFromFile(char * filename,
 		glm::vec3 normal = temp_normals[index - 1];
 		out_normals.push_back(normal);
 	}
+	radious = glm::length(max);
 }
 
 void meshObject::PrepareInstancesMatrices() {

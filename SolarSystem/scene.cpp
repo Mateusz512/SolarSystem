@@ -147,13 +147,27 @@ void Scene::Animate()
 // kontrola naciskania klawiszy klawiatury
 void Scene::KeyPressed(unsigned char key, int x, int y)
 {
+	float displacementSensitivity = 0.1f;
 	if (key == ESCAPE) ThrowException("Zatrzymaj program");
 	switch (key)
 	{
-		case 37: { break; } // LEFT
-		case 38: { break; } // UP
-		case 39: { break; } // RIGHT
-		case 40: { break; } // DOWN
+		case 65: { // LEFT
+			if (selected)
+				Move(selected->position, glm::vec3(-1, 0, 0) * displacementSensitivity, selected->radious);
+			break; 
+		} 
+		case 87: { // UP
+			if (selected)
+				Move(selected->position, glm::vec3(0, 0, -1) * displacementSensitivity, selected->radious);
+			break;  } 
+		case 68: { // RIGHT
+			if (selected)
+				Move(selected->position, glm::vec3(1, 0, 0) * displacementSensitivity, selected->radious);
+			break;  } 
+		case 83: { // DOWN
+			if (selected)
+				Move(selected->position, glm::vec3(0, 0, 1) * displacementSensitivity, selected->radious);
+			break;  } 
 		case 86: { break; } //T
 		case 69: { break; } //E
 		case 82: { break; } //R
@@ -166,14 +180,22 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 		case 116: { break; } //F5		
 		case 117: { break; } //F6		
 
-		case 87: { cameraPosition += cameraDirection * glm::vec3(1, 0, 1) * movementSensitivity; break; } //W
-		case 83: { cameraPosition -= cameraDirection * glm::vec3(1, 0, 1) * movementSensitivity; break; } //S		
-		case 65: { cameraPosition -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * movementSensitivity; break; } //A
-		case 68: { cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * movementSensitivity; break; } //D
+		case 38: { Move(&cameraPosition, cameraDirection * movementSensitivity); break; } //UP
+		case 40: { Move(&cameraPosition, cameraDirection * -movementSensitivity); break; } //DOWN	
+		case 37: { Move(&cameraPosition, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * -movementSensitivity); break; } //LEFT
+		case 39: { Move(&cameraPosition, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * movementSensitivity); break; } //RIGHT
 
 		case 32: { break; }
 	}
 
+}
+
+void Scene::Move(glm::vec3* position, glm::vec3 direction, float radious) {
+	glm::vec3 temp = *position + direction * glm::vec3(1, 0, 1);
+	if (abs(temp.x) + radious <= ROOM_SIZE && abs(temp.z) + radious <= ROOM_SIZE) {
+		position->x = temp.x;
+		position->z = temp.z;
+	}
 }
 
 void Scene::MouseMoved(int x, int y, DraggingMode dr) {
@@ -448,7 +470,7 @@ float Scene::readMouseClickObj(int x, int y) {
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &Pixel);
 	
-	if (Pixel[0] > 3) {
+	if (Pixel[0] >= 3) {
 		meshObject* clicked = NULL;
 		for (int i = 0; i < meshObjects.size(); i++) {
 			if (meshObjects[i]->ID == Pixel[0]) {
@@ -457,14 +479,10 @@ float Scene::readMouseClickObj(int x, int y) {
 			}
 		}
 		if (!clicked) return 0;
-		/*glm::vec3 pos = getGlobalPos(cameraParent);
-		cameraParent = clicked;
-		glm::vec3 npos = getGlobalPos(clicked);
-		cameraPosition = pos + cameraPosition - npos;
-		cameraPosition *= 4 * cameraParent->scale / glm::length(cameraPosition);
-		cameraDirection = glm::normalize(cameraPosition)*-1.0f;*/
-		return Pixel[0];
-	}
-	return Pixel[0];
+		selected = clicked;
+	} else {
+		selected = NULL;
+	}	
+	return	Pixel[0];
 }
 //------------------------------- KONIEC PLIKU -----------------------------------------------

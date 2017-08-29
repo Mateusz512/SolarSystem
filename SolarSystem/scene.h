@@ -77,6 +77,8 @@ void Animate(); // przeprowadza animacje sceny
 
 void KeyPressed(unsigned char key, int x, int y); // obsluga klawiatury
 
+void Move(glm::vec3 * position, glm::vec3 direction, float radious = 0.0f);
+
 void MouseMoved(int x, int y, DraggingMode dr);
 void MouseRolled(int dir);
 void LMBClicked(int x, int y);
@@ -120,7 +122,7 @@ Shader* pickingShader;
 
 Skybox* skybox;
 
-const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
+const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 unsigned int depthCubemap;
 unsigned int depthMapFBO;
 
@@ -128,7 +130,7 @@ float near_plane = 0.1f;
 float far_plane = 400.0f;
 
 glm::vec3 lightPos = glm::vec3(0,3,10);
-glm::vec3 cameraPosition = glm::vec3(5, 1.92, 5);
+glm::vec3 cameraPosition = glm::vec3(5, 1.42, 5);
 float cameraAngle = 45.0f;
 glm::vec3 cameraDirection = glm::normalize(glm::vec3(-1, -0.1, -1));
 
@@ -139,6 +141,9 @@ static const int pointLightsCount = 10;
 PointLight pointLights[pointLightsCount];
 
 std::vector<meshObject*> meshObjects;
+
+float ROOM_SIZE = 7.5f;
+meshObject* selected = NULL;
 };
 
 #endif
