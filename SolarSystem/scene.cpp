@@ -169,7 +169,8 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 				Move(selected->position, glm::vec3(0, 0, 1) * displacementSensitivity, selected->radious);
 			break;  } 
 		case 86: { break; } //T
-		case 69: { break; } //E
+		case 69: { *(selected->rotationMatrix) = glm::rotate(*(selected->rotationMatrix), 10.0f, glm::vec3(0, 1.0f, 0)); break; } //E
+		case 81: { *(selected->rotationMatrix) = glm::rotate(*(selected->rotationMatrix), -10.0f, glm::vec3(0, 1.0f, 0)); break; } //Q
 		case 82: { break; } //R
 		case 112: { LightAmbient += 0.1f; break; } // F1		
 		case 113: { LightAmbient -= 0.1f; break; } //F2		
