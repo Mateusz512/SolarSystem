@@ -12,10 +12,8 @@
 #define _scene_h
 
 #include "common.h"
-#include "globject.h"
-#include "printer.h"
 #include "texture.h"
-#include "blendObject.h"
+#include "meshObject.h"
 #include "shader.h"
 #include <string>
 #include "Skybox.h"
@@ -61,7 +59,7 @@ void DrawLamp(Shader* shader);
 
 void renderShadowMaps();
 
-void renderScene(Shader * shader);
+void renderScene(Shader * shader, meshObject* without = NULL);
 
 void TransformAndDraw(Shader * shader, Drawable * toDraw);
 
@@ -91,7 +89,6 @@ float LightAmbient;
 float mouseSensitivity = 0.17f;
 float movementSensitivity = 0.28f;
 
-glPrinter *Prn;
 
 std::string imie = "Bartek";
 
@@ -119,6 +116,7 @@ Shader* defaultShader;
 Shader* depthShader;
 Shader* skyboxShader;
 Shader* pickingShader;
+Shader* stencilShader;
 
 Skybox* skybox;
 

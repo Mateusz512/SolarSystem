@@ -1,6 +1,6 @@
 #pragma once
 #include "shader.h"
-#include "blendObject.h"
+#include "meshObject.h"
 #include <glm/glm.hpp>
 
 class Skybox

@@ -46,7 +46,7 @@ void Scene::PrepareObjects()
 	meshObjects.push_back(newMeshObject("floor", glm::vec3(0, 0, 0)));
 	meshObjects.push_back(newMeshObject("wall", glm::vec3(0, 0, 0)));
 	meshObjects.push_back(newMeshObject("ceiling", glm::vec3(0, 0, 0)));	
-	meshObjects.push_back(newMeshObject("chair", glm::vec3(4, 0, 4)));
+	meshObjects.push_back(newMeshObject("chair", glm::vec3(4, 0.38022f, 4)));
 	meshObjects.push_back(newMeshObject("chair1", glm::vec3(4, 0,-4)));
 }
 
@@ -88,6 +88,7 @@ void Scene::Init()
 	depthShader = new Shader("shaders\\depthShader.vs", "shaders\\depthShader.fs", "shaders\\depthShader.gs");
 	skyboxShader = new Shader("shaders\\skybox.vs", "shaders\\skybox.fs");
 	pickingShader = new Shader("shaders\\pickingVS.vs", "shaders\\pickingFS.fs");
+	stencilShader = new Shader("shaders\\stencilVS.vs", "shaders\\stencilFS.fs");
 
 	defaultShader->setInt("diffuseTexture", Diffuse);
 	defaultShader->setInt("isAtmo", 0);
@@ -253,7 +254,17 @@ void Scene::Draw()
 	glCullFace(GL_FRONT);
 	renderShadowMaps();
 	glCullFace(GL_BACK);
-	
+
+	glEnable(GL_DEPTH_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0x00);
 
 	// ustaw macierz projekcji na perspektywiczna
 	defaultShader->use();
@@ -267,7 +278,7 @@ void Scene::Draw()
 		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
 	}
 	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-	
+
 	glm::mat4 view = glm::lookAt(cameraPosition,
 		cameraPosition + cameraDirection,
 		glm::vec3(0.0f, 1.0f, 0.0f));
@@ -278,13 +289,33 @@ void Scene::Draw()
 	defaultShader->setVec3("lightPos", lightPos);
 	defaultShader->setVec3("viewPos", cameraPosition);
 	defaultShader->setFloat("far_plane", far_plane);
-	
-	DrawLamp(defaultShader);
-	renderScene(defaultShader);
+
+	renderScene(defaultShader, selected);
+
+	if (selected) {
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+		TransformAndDraw(defaultShader, selected);
+
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		stencilShader->use();
+		stencilShader->setMat4("projection", projection);
+		stencilShader->setMat4("view", view);
+		float tempScale = selected->scale;
+		//glm::vec3 tempPos = glm::vec3(*(selected->position));
+		selected->scale = tempScale * 1.1f;
+		//*(selected->position) += glm::normalize(cameraPosition - tempPos) * 0.3f;
+		glDisable(GL_DEPTH_TEST);
+		TransformAndDraw(stencilShader, selected);
+		selected->scale = tempScale;
+		//*(selected->position) = tempPos;
+		glStencilMask(0xFF);
+		glEnable(GL_DEPTH_TEST);
+	}
+
 
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
-
-
 	//--------------------------------------------------
 	// Rysowanie w trybie ortogonalnym
 	//--------------------------------------------------
@@ -372,10 +403,12 @@ void Scene::renderShadowMaps() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Scene::renderScene(Shader* shader) {
+void Scene::renderScene(Shader* shader, meshObject* without) {
 
 	for (int i = 0; i < meshObjects.size(); i++) {
-		RenderDrawable(shader, meshObjects[i]);
+		if (meshObjects[i] != without) {
+			RenderDrawable(shader, meshObjects[i]);
+		}
 	}
 }
 

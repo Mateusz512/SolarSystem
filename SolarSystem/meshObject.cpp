@@ -1,4 +1,4 @@
-#include "blendObject.h"
+#include "meshObject.h"
 
 meshObject::meshObject()
 {

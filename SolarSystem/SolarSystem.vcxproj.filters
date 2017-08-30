@@ -25,22 +25,13 @@
     <ClInclude Include="glew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="globject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="printer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="blendObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vboindexer.h">
@@ -61,27 +52,21 @@
     <ClInclude Include="MeshBuffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="meshObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="globject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="printer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="blendObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vboindexer.cpp">
@@ -97,6 +82,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MeshBuffers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="meshObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -126,6 +114,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\pickingVS.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\stencilFS.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\stencilVS.vs">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
