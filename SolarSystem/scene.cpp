@@ -203,30 +203,12 @@ void Scene::MouseMoved(int x, int y, DraggingMode dr) {
 	currentMousePosition.x = x; currentMousePosition.y = y;
 	glm::vec2 delta = currentMousePosition - previousMousePosition;
 	switch (dr) {
+		case Right:
 		case Left:
 			cameraDirection = glm::rotate(cameraDirection, delta.x*mouseSensitivity, glm::vec3(0, 1, 0));
 			cameraDirection = glm::rotate(cameraDirection, delta.y*mouseSensitivity,
 				glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))));
 			break;
-		case Middle:
-			if (abs(delta.x) > abs(delta.y)) {
-			cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0)))
-				*movementSensitivity * 0.2f * ((delta.x>0)?-1.0f:1.0f);
-			}else{
-			cameraPosition += glm::normalize(glm::cross(cameraDirection, glm::vec3(1, 0, 0)))
-				*movementSensitivity * 0.2f * ((delta.y>0) ? -1.0f : 1.0f);
-			}
-			break;
-		/*case Right:
-			if (abs(delta.x) > abs(delta.y)) {
-				cameraPosition = glm::rotate(cameraPosition, ((delta.x > 0) ? -1.0f : 1.0f)*3.0f , glm::vec3(0, 1, 0));
-				cameraDirection = glm::rotate(cameraDirection, ((delta.x > 0) ? -1.0f : 1.0f)*3.0f, glm::vec3(0, 1, 0));
-			}
-			else {
-				cameraPosition = glm::rotate(cameraPosition, ((delta.y < 0) ? -1.0f : 1.0f)*2.0f, glm::normalize(glm::cross(cameraPosition, glm::vec3(0, 1, 0))));
-				cameraDirection = glm::rotate(cameraDirection, ((delta.y < 0) ? -1.0f : 1.0f)*-2.0f, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))));
-			}
-			break;*/
 	}
 	previousMousePosition.x = x; previousMousePosition.y = y;
 	isFirstMouseMovement = false;
