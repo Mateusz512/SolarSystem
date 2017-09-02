@@ -307,7 +307,7 @@ void Scene::Draw()
 		selected->scale = tempScale * 1.1f;
 		//*(selected->position) += glm::normalize(cameraPosition - tempPos) * 0.3f;
 		glDisable(GL_DEPTH_TEST);
-		TransformAndDraw(stencilShader, selected);
+		//TransformAndDraw(stencilShader, selected);
 		selected->scale = tempScale;
 		//*(selected->position) = tempPos;
 		glStencilMask(0xFF);
