@@ -4,11 +4,11 @@
 #include <map>
 #include <string>
 
-class MeshManager
+class AlreadyLoadedHelper
 {
 public:
-	MeshManager();
-	~MeshManager();
+	AlreadyLoadedHelper();
+	~AlreadyLoadedHelper();
 	MeshBuffers* alreadyLoaded(char* name);
 	void add(char*name, MeshBuffers* meshBuffers);
 private:

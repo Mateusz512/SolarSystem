@@ -272,7 +272,7 @@ LRESULT CALLBACK WndProc(	HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM	lParam)
 			if (currentX == cPos.x && currentY == cPos.y) {
 				RECT rect = { NULL };
 				GetWindowRect(hWnd, &rect);
-				SC->DrawPicking();
+				SC->RenderPickingBuffer();
 				SC->LMBClicked(currentX-rect.left, currentY-rect.top-30);
 				//SwapBuffers(hDC);			
 			}			

@@ -8,7 +8,7 @@
 #include "glm\glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <filesystem>
-#include "MeshManager.h"
+#include "AlreadyLoadedHelper.h"
 
 #define INDEX_BUFFER 0    
 #define POS_VB       1
@@ -23,18 +23,17 @@ public:
 		char * diffuseTexture, 
 		char * specularTexture, 
 		char * normalTexture, 
-		char * extraTexture, 
-		int instancesCount=0);	
+		char * extraTexture);	
 	~meshObject();
 	void Draw();
 	float radious = 0.0f;
 	
-	static int meshObject::globalID;
-	static MeshManager* meshObject::meshManager;
+	static int meshObject::staticID;
+	static AlreadyLoadedHelper* meshObject::alreadyLoadedHelper;
 	int ID;
 
 	meshObject() {
-		ID = meshObject::globalID++;
+		ID = meshObject::staticID++;
 		position = new glm::vec3(0, 0, 0);
 		rotationMatrix = new glm::mat4(1);
 		scale = 1.0f;
@@ -51,12 +50,9 @@ public:
 	}
 
 	char* name;
-	glm::mat4 * modelMatrices;
-	int instancesCount=0;
 
 	void Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture);
 	void ReadFromFile(char * filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
-	void PrepareInstancesMatrices();
 
 	GLuint m_VAO;
 

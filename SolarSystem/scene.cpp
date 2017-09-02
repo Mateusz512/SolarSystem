@@ -1,16 +1,5 @@
 #include "scene.h"
 
-char* mergeTwoStrings(std::string one, std::string two) {
-	const int len = one.length() + two.length();
-	char* result = new char[len];
-	strcpy(result, one.c_str());
-	strcat(result, two.c_str());
-	return result;
-}
-
-float random(float LO, float HI) {
-	return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-}
 Scene::Scene(int new_width, int new_height)
 {
 	width = new_width;
@@ -20,9 +9,9 @@ Scene::Scene(int new_width, int new_height)
 // Domyslny destruktor 
 Scene::~Scene()
 {
-	if(defaultShader) delete defaultShader;
+	if(commonShader) delete commonShader;
 	if(depthShader) delete depthShader;
-	defaultShader = NULL;
+	commonShader = NULL;
 	depthShader = NULL;
 }
 //--------------------------------------------------------------------------------------------
@@ -36,11 +25,11 @@ void Scene::PrepareObjects()
 }
 
 meshObject* Scene::newMeshObject(std::string name, glm::vec3 pos) {
-	meshObject* mo = new meshObject(mergeTwoStrings(OBJ_LOCATION, name + ".obj"),
-		mergeTwoStrings(TEX_LOCATION, name + "_diff.jpg"),
-		mergeTwoStrings(TEX_LOCATION, name + "_spec.jpg"),
-		mergeTwoStrings(TEX_LOCATION, name + "_normal.jpg"),
-		mergeTwoStrings(TEX_LOCATION, name + "_extra.jpg"));
+	meshObject* mo = new meshObject(JoinTwoStrings(OBJ_LOCATION, name + ".obj"),
+		JoinTwoStrings(TEX_LOCATION, name + "_diff.jpg"),
+		JoinTwoStrings(TEX_LOCATION, name + "_spec.jpg"),
+		JoinTwoStrings(TEX_LOCATION, name + "_normal.jpg"),
+		JoinTwoStrings(TEX_LOCATION, name + "_extra.jpg"));
 	mo->position = new glm::vec3(pos);
 	return mo;
 }
@@ -62,22 +51,22 @@ void Scene::Resize(int new_width, int new_height)
 // inicjuje proces renderowania OpenGL
 void Scene::Init()
 {
-	meshObject::meshManager = new MeshManager();
+	meshObject::alreadyLoadedHelper = new AlreadyLoadedHelper();
 
 	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
 
 	// przygotuj programy shaderow
 	//PreparePrograms();
-	defaultShader = new Shader("shaders\\defaultVS.vs", "shaders\\defaultFS.fs");
+	commonShader = new Shader("shaders\\defaultVS.vs", "shaders\\defaultFS.fs");
 	depthShader = new Shader("shaders\\depthShader.vs", "shaders\\depthShader.fs", "shaders\\depthShader.gs");
 	skyboxShader = new Shader("shaders\\skybox.vs", "shaders\\skybox.fs");
 	pickingShader = new Shader("shaders\\pickingVS.vs", "shaders\\pickingFS.fs");
 	stencilShader = new Shader("shaders\\stencilVS.vs", "shaders\\stencilFS.fs");
 
-	defaultShader->setInt("diffuseTexture", Diffuse);
-	defaultShader->setInt("isAtmo", 0);
-	defaultShader->setInt("shadows", 1);
+	commonShader->setInt("diffuseTexture", Diffuse);
+	commonShader->setInt("isAtmo", 0);
+	commonShader->setInt("shadows", 1);
 
 	// przygotuj obiekty do wyswietlenia 
 	PrepareObjects();
@@ -103,7 +92,7 @@ void Scene::Init()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	defaultShader->setInt("depthMap", ShadowCube);
+	commonShader->setInt("depthMap", ShadowCube);
 	
 	skybox = new Skybox(skyboxShader);
 
@@ -208,11 +197,11 @@ void Scene::MouseRolled(int dir) {
 }
 
 void Scene::LMBClicked(int x, int y) {
-	float dummy = readMouseClickObj(x, y);
+	float dummy = CheckWhatObjectWasClicked(x, y);
 }
 //--------------------------------------------------------------------------------------------
 // rysuje scene OpenGL 
-void Scene::DrawPicking() {
+void Scene::RenderPickingBuffer() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0, 0, 0, 1.0f);
 	pickingShader->use();
@@ -224,83 +213,11 @@ void Scene::DrawPicking() {
 	pickingShader->setMat4("projection", projection);
 	pickingShader->setMat4("view", view);
 
-	//DrawLamp(pickingShader);
-	renderScene(pickingShader);
+	DrawAllObjects(pickingShader);
 }
 
 void Scene::Draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0, 0, 0, 1.0f);
-	//if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
-
-	////glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	renderShadowMaps();
-	glCullFace(GL_BACK);
-
-	glEnable(GL_DEPTH_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilMask(0x00);
-
-	// ustaw macierz projekcji na perspektywiczna
-	defaultShader->use();
-	for (int i = 0; i < pointLightsCount; i++) {
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
-		defaultShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
-		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
-		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
-		defaultShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
-	}
-	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
-
-	glm::mat4 view = glm::lookAt(cameraPosition,
-		cameraPosition + cameraDirection,
-		glm::vec3(0.0f, 1.0f, 0.0f));
-	defaultShader->setMat4("projection", projection);
-	defaultShader->setMat4("view", view);
-
-	// set lighting uniforms
-	defaultShader->setVec3("lightPos", lightPos);
-	defaultShader->setVec3("viewPos", cameraPosition);
-	defaultShader->setFloat("far_plane", far_plane);
-
-	renderScene(defaultShader, selected);
-
-	if (selected) {
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-		TransformAndDraw(defaultShader, selected);
-
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		stencilShader->use();
-		stencilShader->setMat4("projection", projection);
-		stencilShader->setMat4("view", view);
-		float tempScale = selected->scale;
-		//glm::vec3 tempPos = glm::vec3(*(selected->position));
-		selected->scale = tempScale * 1.1f;
-		//*(selected->position) += glm::normalize(cameraPosition - tempPos) * 0.3f;
-		glDisable(GL_DEPTH_TEST);
-		//TransformAndDraw(stencilShader, selected);
-		selected->scale = tempScale;
-		//*(selected->position) = tempPos;
-		glStencilMask(0xFF);
-		glEnable(GL_DEPTH_TEST);
-	}
-
-
-	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
 	//--------------------------------------------------
 	// Rysowanie w trybie ortogonalnym
 	//--------------------------------------------------
@@ -334,32 +251,80 @@ void Scene::Draw()
 	}
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);*/
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0, 0, 0, 1.0f);
+	//if (err) return; // sprawdz flage bledu (np. kompilacja shadera)
+
+	////glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	RenderShadowMapsCube();
+	glCullFace(GL_BACK);
+
+	glEnable(GL_DEPTH_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0x00);
+
+	// ustaw macierz projekcji na perspektywiczna
+	commonShader->use();
+	for (int i = 0; i < pointLightsCount; i++) {
+		commonShader->setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
+		commonShader->setVec3("pointLights[" + std::to_string(i) + "].ambient", pointLights[i].ambient);
+		commonShader->setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLights[i].diffuse);
+		commonShader->setVec3("pointLights[" + std::to_string(i) + "].specular", pointLights[i].specular);
+		commonShader->setFloat("pointLights[" + std::to_string(i) + "].constant", pointLights[i].constant);
+		commonShader->setFloat("pointLights[" + std::to_string(i) + "].linear", pointLights[i].linear);
+		commonShader->setFloat("pointLights[" + std::to_string(i) + "].quadratic", pointLights[i].quadratic);
+	}
+	glm::mat4 projection = glm::perspective(cameraAngle, (float)width / (float)height, near_plane, far_plane);
+
+	glm::mat4 view = glm::lookAt(cameraPosition,
+		cameraPosition + cameraDirection,
+		glm::vec3(0.0f, 1.0f, 0.0f));
+	commonShader->setMat4("projection", projection);
+	commonShader->setMat4("view", view);
+
+	// set lighting uniforms
+	commonShader->setVec3("lightPos", lightPos);
+	commonShader->setVec3("viewPos", cameraPosition);
+	commonShader->setFloat("far_plane", far_plane);
+
+	DrawAllObjects(commonShader, selected);
+
+	if (selected) {
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+		DrawObject(commonShader, selected);
+
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		stencilShader->use();
+		stencilShader->setMat4("projection", projection);
+		stencilShader->setMat4("view", view);
+		float tempScale = selected->scale;
+		//glm::vec3 tempPos = glm::vec3(*(selected->position));
+		selected->scale = tempScale * 1.1f;
+		//*(selected->position) += glm::normalize(cameraPosition - tempPos) * 0.3f;
+		glDisable(GL_DEPTH_TEST);
+		//TransformAndDraw(stencilShader, selected);
+		selected->scale = tempScale;
+		//*(selected->position) = tempPos;
+		glStencilMask(0xFF);
+		glEnable(GL_DEPTH_TEST);
+	}
+
+
+	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
 }
 
-void Scene::DrawLamp(Shader* shader) {
-
-	/*shader->use();
-	defaultShader->setInt("shadows", -1);
-	glm::mat4 mTransform = glm::mat4(1);
-	mTransform = (*celestrials[Sun]->rotationMatrix) * mTransform;
-	if (celestrials[Sun]->scale != 1.0f && celestrials[Sun]->scale>0)
-		mTransform = glm::scale(mTransform, celestrials[Sun]->scale, celestrials[Sun]->scale, celestrials[Sun]->scale);
-	shader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
-	shader->setMat4("model", mTransform);
-
-	glActiveTexture(GL_TEXTURE0 + Diffuse);
-	glBindTexture(GL_TEXTURE_2D, celestrials[Sun]->getTextureID(Diffuse));
-	glEnable(GL_TEXTURE_2D);
-	shader->setInt("EnableDiffuseTexture", 1);
-	shader->setInt("diffuseTexture", Diffuse);
-
-	shader->setInt("gObjectIndex", celestrials[Sun]->ID);
-	celestrials[Sun]->Draw();
-	defaultShader->setInt("shadows", 1);*/
-
-}
-
-void Scene::renderShadowMaps() {
+void Scene::RenderShadowMapsCube() {
 	// 0. create depth cubemap transformation matrices
 	// -----------------------------------------------
 	glm::mat4 shadowProj = glm::perspective(90.0f, (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
@@ -382,61 +347,60 @@ void Scene::renderShadowMaps() {
 		depthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 	depthShader->setFloat("far_plane", far_plane);
 	depthShader->setVec3("lightPos", lightPos);
-	renderScene(depthShader);
+	DrawAllObjects(depthShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Scene::renderScene(Shader* shader, meshObject* without) {
+void Scene::DrawAllObjects(Shader* shader, meshObject* without) {
 
 	for (int i = 0; i < meshObjects.size(); i++) {
 		if (meshObjects[i] != without) {
-			RendermeshObject(shader, meshObjects[i]);
+			DrawObject(shader, meshObjects[i]);
 		}
 	}
 }
 
-void Scene::TransformAndDraw(Shader* shader, meshObject* toDraw) {
-
-	shader->use();
-	shader->setInt("EnableDiffuseTexture", 0);
-	shader->setInt("EnableSpecularTexture", 0);
-	shader->setInt("EnableNormalTexture", 0);
-	shader->setInt("EnableExtraTexture", 0);
-
+void Scene::DrawObject(Shader* shader, meshObject* toDraw) {
 	glm::mat4 mTransform=glm::mat4(1);
 	mTransform = glm::translate(mTransform, (glm::vec3)(*toDraw->position));
 	mTransform = mTransform * (*toDraw->rotationMatrix);
 	if (toDraw->scale != 1.0f && toDraw->scale>0)
 		mTransform = glm::scale(mTransform, toDraw->scale, toDraw->scale, toDraw->scale);
+	shader->use();
 	shader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
 	shader->setMat4("model", mTransform);
-	for (int i = 0; i < 4; i++) {
-		GLuint dummy = toDraw->getTextureID(i);
-		if (dummy == UINT_MAX){
+	shader->setInt("EnableDiffuseTexture", 0);
+	shader->setInt("EnableSpecularTexture", 0);
+	shader->setInt("EnableNormalTexture", 0);
+	shader->setInt("EnableExtraTexture", 0);
+	shader->setInt("shadows", 1);
+	for (int i = Diffuse; i <= Extra; i++) {
+		GLuint textureID = toDraw->getTextureID(i);
+		if (textureID == UINT_MAX){
 			continue;		
 		}
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, dummy);
+		glBindTexture(GL_TEXTURE_2D, textureID);
 		glEnable(GL_TEXTURE_2D);
 		switch (i) {
-		case Diffuse:
-			shader->setInt("EnableDiffuseTexture", 1);
-			shader->setInt("diffuseTexture", i);
-			break;
-		case Specular:
-			shader->setInt("EnableSpecularTexture", 1);
-			shader->setInt("specularTexture", i);
-			break;
-		case Normal:
-			shader->setInt("EnableNormalTexture", 1);
-			shader->setInt("normalTexture", i);
-			break;
-		case Extra:
-			shader->setInt("EnableExtraTexture", 1);
-			shader->setInt("extraTexture", i);
-			break;
+			case Diffuse:
+				shader->setInt("EnableDiffuseTexture", 1);
+				shader->setInt("diffuseTexture", i);
+				break;
+			case Specular:
+				shader->setInt("EnableSpecularTexture", 1);
+				shader->setInt("specularTexture", i);
+				break;
+			case Normal:
+				shader->setInt("EnableNormalTexture", 1);
+				shader->setInt("normalTexture", i);
+				break;
+			case Extra:
+				shader->setInt("EnableExtraTexture", 1);
+				shader->setInt("extraTexture", i);
+				break;
 		}
 	}
 	glActiveTexture(GL_TEXTURE0+ShadowCube);
@@ -445,21 +409,9 @@ void Scene::TransformAndDraw(Shader* shader, meshObject* toDraw) {
 	shader->setInt("depthMap", ShadowCube);
 	shader->setInt("gObjectIndex", toDraw->ID);
 	toDraw->Draw();
-
 }
 
-void Scene::RendermeshObject(Shader* shader, meshObject* toDraw) {
-
-	defaultShader->setInt("shadows", 1); 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendEquation(GL_FUNC_ADD);
-	TransformAndDraw(shader, toDraw);
-	//glDisable(GL_BLEND);
-
-}
-
-float Scene::readMouseClickObj(int x, int y) {
+float Scene::CheckWhatObjectWasClicked(int x, int y) {
 	unsigned char Pixel[4];
 	GLint viewport[4];
 
@@ -482,3 +434,15 @@ float Scene::readMouseClickObj(int x, int y) {
 	return	Pixel[0];
 }
 //------------------------------- KONIEC PLIKU -----------------------------------------------
+
+char* Scene::JoinTwoStrings(std::string one, std::string two) {
+	const int len = one.length() + two.length();
+	char* result = new char[len];
+	strcpy(result, one.c_str());
+	strcat(result, two.c_str());
+	return result;
+}
+
+float Scene::random(float LO, float HI) {
+	return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+}

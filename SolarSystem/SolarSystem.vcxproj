@@ -124,7 +124,7 @@
     <ClInclude Include="glew.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MeshBuffers.h" />
-    <ClInclude Include="MeshManager.h" />
+    <ClInclude Include="AlreadyLoadedHelper.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="Skybox.h" />
@@ -136,7 +136,7 @@
     <ClCompile Include="common.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshBuffers.cpp" />
-    <ClCompile Include="MeshManager.cpp" />
+    <ClCompile Include="AlreadyLoadedHelper.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="texture.cpp" />

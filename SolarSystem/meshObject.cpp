@@ -1,20 +1,17 @@
 #include "meshObject.h"
 
-int meshObject::globalID = 1;
-MeshManager* meshObject::meshManager = NULL;
+int meshObject::staticID = 1;
+AlreadyLoadedHelper* meshObject::alreadyLoadedHelper = NULL;
 
 meshObject::meshObject(char* filename, 
 	char* diffuseTexture, 
 	char* specularTexture, 
 	char* normalTexture, 
-	char* extraTexture, 
-	int instancesCount) : meshObject()
+	char* extraTexture) : meshObject()
 {
 	this->name = filename;
-	this->instancesCount = instancesCount;
 	Load(filename, diffuseTexture, specularTexture, normalTexture, extraTexture);
 }
-
 
 meshObject::~meshObject()
 {
@@ -25,26 +22,15 @@ void meshObject::Draw()
 	// Index buffer
 	glBindVertexArray(m_VAO);
 	
-	if (instancesCount > 0) {
-		glDrawElementsInstanced(GL_TRIANGLES,
-			size,
-			GL_UNSIGNED_SHORT,
-			(void*)(0),
-			instancesCount);
-	}
-	else {
-		glDrawElements(
-			GL_TRIANGLES,      // mode
-			size,    // count
-			GL_UNSIGNED_SHORT,   // type
-			(void*)0           // element array buffer offset
-		);		
-	}
+	glDrawElements(
+		GL_TRIANGLES,      // mode
+		size,    // count
+		GL_UNSIGNED_SHORT,   // type
+		(void*)0           // element array buffer offset
+	);		
+
 	glBindVertexArray(0);
 }
-
-
-
 
 void meshObject::Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture) {
 
@@ -60,9 +46,8 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;
 
-	
-	MeshBuffers* meshBuffers = meshManager->alreadyLoaded(filename);
-	if (meshBuffers != NULL && instancesCount==0) {
+	MeshBuffers* meshBuffers = alreadyLoadedHelper->alreadyLoaded(filename);
+	if (meshBuffers != NULL) {
 		this->m_VAO = meshBuffers->m_VAO;
 		this->size = meshBuffers->size;
 		this->vertexbuffer = meshBuffers->vertexbuffer;
@@ -70,9 +55,7 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 		this->normalbuffer = meshBuffers->normalbuffer;
 		this->elementbuffer = meshBuffers->elementbuffer;
 		this->modelMatrixBuffer = meshBuffers->modelMatrixBuffer;
-	}
-	else {
-
+	} else {
 		glGenVertexArrays(1, &m_VAO);
 		glBindVertexArray(m_VAO);
 
@@ -135,43 +118,10 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 
-		if (instancesCount > 0) {
-			PrepareInstancesMatrices();
-
-			glGenBuffers(1, &modelMatrixBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, modelMatrixBuffer);
-
-			for (unsigned int i = 0; i < 4; i++) {
-				glEnableVertexAttribArray(3 + i);
-				glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
-					(const GLvoid*)(sizeof(GLfloat) * i * 4));
-				glVertexAttribDivisor(3 + i, 1);
-			}
-			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instancesCount, modelMatrices, GL_DYNAMIC_DRAW);
-
-
-			for (int i = 0; i < instancesCount; i++)
-			{
-				modelMatrices[i] = glm::transpose(glm::inverse(modelMatrices[i]));
-			}
-
-			glGenBuffers(1, &normalMatrixBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, normalMatrixBuffer);
-
-			for (unsigned int i = 0; i < 4; i++) {
-				glEnableVertexAttribArray(7 + i);
-				glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
-					(const GLvoid*)(sizeof(GLfloat) * i * 4));
-				glVertexAttribDivisor(7 + i, 1);
-			}
-			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instancesCount, modelMatrices, GL_DYNAMIC_DRAW);
-			delete[] modelMatrices;
-		}
-
 		glBindVertexArray(0);
 		size = indices.size();
 
-		meshManager->add(filename,new MeshBuffers(m_VAO,size, vertexbuffer, uvbuffer, normalbuffer, elementbuffer, modelMatrixBuffer));
+		alreadyLoadedHelper->add(filename,new MeshBuffers(m_VAO,size, vertexbuffer, uvbuffer, normalbuffer, elementbuffer, modelMatrixBuffer));
 	}
 }
 
@@ -256,35 +206,4 @@ void meshObject::ReadFromFile(char * filename,
 		out_normals.push_back(normal);
 	}
 	radious = glm::length(max);
-}
-
-void meshObject::PrepareInstancesMatrices() {
-	modelMatrices = new glm::mat4[instancesCount];
-	srand(1337); // initialize random seed	
-	float radius = 25.0;
-	float offset = 5.0f;
-	for (int i = 0; i < instancesCount; i++)
-	{
-		glm::mat4 model;
-		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-		float angle = (float)i / (float)instancesCount * 360.0f;
-		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * radius + displacement;
-		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.1f; // keep height of asteroid field smaller compared to width of x and z
-		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
-
-		// 2. scale: Scale between 0.05 and 0.25f
-		float scale = (rand() % 20) / 100.0f + 0.05;
-		model = glm::scale(model, glm::vec3(scale/2.0f));
-
-		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-		float rotAngle = (rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-		// 4. now add to list of matrices
-		modelMatrices[i] = model;
-	}
 }
