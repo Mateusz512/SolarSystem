@@ -1,15 +1,14 @@
 #include "meshObject.h"
 
-meshObject::meshObject()
-{
-}
+int meshObject::globalID = 1;
+MeshManager* meshObject::meshManager = NULL;
 
 meshObject::meshObject(char* filename, 
 	char* diffuseTexture, 
 	char* specularTexture, 
 	char* normalTexture, 
 	char* extraTexture, 
-	int instancesCount) : Drawable()
+	int instancesCount) : meshObject()
 {
 	this->name = filename;
 	this->instancesCount = instancesCount;
@@ -23,21 +22,9 @@ meshObject::~meshObject()
 
 void meshObject::Draw()
 {
-	// Bind our texture in Texture Unit 0
-	// Set our "myTextureSampler" sampler to user Texture Unit 0
-	//glUniform1i(TextureID, 0);gl.activeTexture(gl.TEXTURE0);
-
-	// 1rst attribute buffer : vertices
-
-	// 2nd attribute buffer : UVs
-
-	// 3rd attribute buffer : normals
-
 	// Index buffer
 	glBindVertexArray(m_VAO);
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
+	
 	if (instancesCount > 0) {
 		glDrawElementsInstanced(GL_TRIANGLES,
 			size,

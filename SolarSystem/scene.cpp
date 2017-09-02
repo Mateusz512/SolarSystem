@@ -8,21 +8,6 @@ char* mergeTwoStrings(std::string one, std::string two) {
 	return result;
 }
 
-glm::vec3 getGlobalPos(Drawable* obj) {
-	glm::vec3 Pos = glm::vec3(0);
-	std::vector<Drawable*> parents;
-	Drawable* parent = obj->parent;
-	while (parent != NULL) {
-		parents.push_back(parent);
-		parent = parent->parent;
-	}
-	for (int i = 0; i < parents.size(); i++) {
-		Pos += *parents[i]->position;
-	}
-	Pos += *obj->position;
-	return Pos;
-}
-
 float random(float LO, float HI) {
 	return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 }
@@ -77,7 +62,7 @@ void Scene::Resize(int new_width, int new_height)
 // inicjuje proces renderowania OpenGL
 void Scene::Init()
 {
-	Drawable::meshManager = new MeshManager();
+	meshObject::meshManager = new MeshManager();
 
 	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
@@ -407,12 +392,12 @@ void Scene::renderScene(Shader* shader, meshObject* without) {
 
 	for (int i = 0; i < meshObjects.size(); i++) {
 		if (meshObjects[i] != without) {
-			RenderDrawable(shader, meshObjects[i]);
+			RendermeshObject(shader, meshObjects[i]);
 		}
 	}
 }
 
-void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
+void Scene::TransformAndDraw(Shader* shader, meshObject* toDraw) {
 
 	shader->use();
 	shader->setInt("EnableDiffuseTexture", 0);
@@ -421,11 +406,6 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 	shader->setInt("EnableExtraTexture", 0);
 
 	glm::mat4 mTransform=glm::mat4(1);
-	Drawable* parent = toDraw->parent;
-	while (parent != NULL) {
-		mTransform = glm::translate(mTransform, (glm::vec3)(*parent->position));
-		parent = parent->parent;
-	}
 	mTransform = glm::translate(mTransform, (glm::vec3)(*toDraw->position));
 	mTransform = mTransform * (*toDraw->rotationMatrix);
 	if (toDraw->scale != 1.0f && toDraw->scale>0)
@@ -468,7 +448,7 @@ void Scene::TransformAndDraw(Shader* shader, Drawable* toDraw) {
 
 }
 
-void Scene::RenderDrawable(Shader* shader, Drawable* toDraw) {
+void Scene::RendermeshObject(Shader* shader, meshObject* toDraw) {
 
 	defaultShader->setInt("shadows", 1); 
 	//glEnable(GL_BLEND);

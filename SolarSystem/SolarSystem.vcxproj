@@ -121,7 +121,6 @@
   <ItemGroup>
     <ClInclude Include="meshObject.h" />
     <ClInclude Include="common.h" />
-    <ClInclude Include="Drawable.h" />
     <ClInclude Include="glew.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MeshBuffers.h" />
@@ -135,7 +134,6 @@
   <ItemGroup>
     <ClCompile Include="meshObject.cpp" />
     <ClCompile Include="common.cpp" />
-    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshBuffers.cpp" />
     <ClCompile Include="MeshManager.cpp" />

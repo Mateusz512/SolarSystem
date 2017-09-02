@@ -61,9 +61,9 @@ void renderShadowMaps();
 
 void renderScene(Shader * shader, meshObject* without = NULL);
 
-void TransformAndDraw(Shader * shader, Drawable * toDraw);
+void TransformAndDraw(Shader * shader, meshObject * toDraw);
 
-void RenderDrawable(Shader* shader, Drawable* toDraw);
+void RendermeshObject(Shader* shader, meshObject* toDraw);
 
 float readMouseClickObj(int x, int y);
 
