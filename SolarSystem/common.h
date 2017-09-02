@@ -39,11 +39,6 @@ void PrintLog(char *message);
 void ThrowException(char *msg);
 void ThrowException(std::string *msg);
 
-enum CelestrialObject {
-	Sun=0,Mercury,Venus,Earth,Mars,Jupiter,Saturn,Uranus,Neptune,
-	Moon,Phobos,Deimos,Europa,Ganimedes,Io,Callisto,Titan,Encelatus
-};
-
 enum Textures {
 	Diffuse = 0,
 	Specular = 1,
@@ -55,6 +50,4 @@ enum Textures {
 enum DraggingMode {
 	NotDragging,Left,Middle,Right
 };
-
-
 #endif

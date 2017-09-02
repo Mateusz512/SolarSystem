@@ -1,5 +1,13 @@
 #include "scene.h"
 
+char* JoinTwoStrings(std::string one, std::string two) {
+	const int len = one.length() + two.length();
+	char* result = new char[len];
+	strcpy(result, one.c_str());
+	strcat(result, two.c_str());
+	return result;
+}
+
 Scene::Scene(int new_width, int new_height)
 {
 	width = new_width;
@@ -25,7 +33,7 @@ void Scene::PrepareObjects()
 }
 
 meshObject* Scene::newMeshObject(std::string name, glm::vec3 pos) {
-	meshObject* mo = new meshObject(JoinTwoStrings(OBJ_LOCATION, name + ".obj"),
+	meshObject* mo = new meshObject(JoinTwoStrings(OBJ_LOCATION, name),
 		JoinTwoStrings(TEX_LOCATION, name + "_diff.jpg"),
 		JoinTwoStrings(TEX_LOCATION, name + "_spec.jpg"),
 		JoinTwoStrings(TEX_LOCATION, name + "_normal.jpg"),
@@ -435,13 +443,6 @@ float Scene::CheckWhatObjectWasClicked(int x, int y) {
 }
 //------------------------------- KONIEC PLIKU -----------------------------------------------
 
-char* Scene::JoinTwoStrings(std::string one, std::string two) {
-	const int len = one.length() + two.length();
-	char* result = new char[len];
-	strcpy(result, one.c_str());
-	strcat(result, two.c_str());
-	return result;
-}
 
 float Scene::random(float LO, float HI) {
 	return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));

@@ -63,8 +63,6 @@ void DrawObject(Shader * shader, meshObject * toDraw); // rysuje jeden obiekt
 
 float CheckWhatObjectWasClicked(int x, int y); // sprawdam czy klinkê³o na jakiœ obiekt
 
-char * JoinTwoStrings(std::string one, std::string two);
-
 float random(float LO, float HI);
 
 void Resize(int new_width, int new_height); // zmienia rozmiar sceny 

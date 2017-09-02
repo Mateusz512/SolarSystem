@@ -5,10 +5,14 @@
 #include "texture.h"
 #include <vector>
 #include <sstream>
+#include <fstream>
+#include <iterator>
 #include "glm\glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <filesystem>
 #include "AlreadyLoadedHelper.h"
+
+#include <ctime>
 
 #define INDEX_BUFFER 0    
 #define POS_VB       1
@@ -54,19 +58,24 @@ public:
 	void Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture);
 	void ReadFromFile(char * filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
 
-	GLuint m_VAO;
-
+	void SuperCoolRead(const char* path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
+	void SuperCoolWrite(const char* path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
+	
 	glm::vec3* position;
 	glm::mat4* rotationMatrix;
 	float scale = 1.0f;
 
 	glTexture** textures;
-	GLuint size;
-	GLuint vertexbuffer;
-	GLuint uvbuffer;
-	GLuint normalbuffer;
-	GLuint elementbuffer;
-	GLuint modelMatrixBuffer;
-	GLuint normalMatrixBuffer;
+	MeshBuffers* meshBuffers;
+
+private:
+
+	char* JoinTwoStrings(std::string one, std::string two) {
+		const int len = one.length() + two.length();
+		char* result = new char[len];
+		strcpy(result, one.c_str());
+		strcat(result, two.c_str());
+		return result;
+	}
 };
 

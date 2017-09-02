@@ -1,5 +1,6 @@
 #include "meshObject.h"
 
+
 int meshObject::staticID = 1;
 AlreadyLoadedHelper* meshObject::alreadyLoadedHelper = NULL;
 
@@ -20,11 +21,11 @@ meshObject::~meshObject()
 void meshObject::Draw()
 {
 	// Index buffer
-	glBindVertexArray(m_VAO);
+	glBindVertexArray(this->meshBuffers->m_VAO);
 	
 	glDrawElements(
 		GL_TRIANGLES,      // mode
-		size,    // count
+		this->meshBuffers->size,    // count
 		GL_UNSIGNED_SHORT,   // type
 		(void*)0           // element array buffer offset
 	);		
@@ -42,34 +43,37 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 		textures[Normal] = new glTexture(normalTexture);
 	if (extraTexture != NULL && std::experimental::filesystem::exists(extraTexture))
 		textures[Extra] = new glTexture(extraTexture);
-	std::vector< glm::vec3 > vertices;
-	std::vector< glm::vec2 > uvs;
-	std::vector< glm::vec3 > normals;
 
-	MeshBuffers* meshBuffers = alreadyLoadedHelper->alreadyLoaded(filename);
-	if (meshBuffers != NULL) {
-		this->m_VAO = meshBuffers->m_VAO;
-		this->size = meshBuffers->size;
-		this->vertexbuffer = meshBuffers->vertexbuffer;
-		this->uvbuffer = meshBuffers->uvbuffer;
-		this->normalbuffer = meshBuffers->normalbuffer;
-		this->elementbuffer = meshBuffers->elementbuffer;
-		this->modelMatrixBuffer = meshBuffers->modelMatrixBuffer;
-	} else {
-		glGenVertexArrays(1, &m_VAO);
-		glBindVertexArray(m_VAO);
+	this->meshBuffers = alreadyLoadedHelper->alreadyLoaded(filename);
+	if (meshBuffers == NULL) {
+		this->meshBuffers = new MeshBuffers();
+		glGenVertexArrays(1, &(this->meshBuffers->m_VAO));
+		glBindVertexArray(this->meshBuffers->m_VAO);
 
-		ReadFromFile(filename, vertices, uvs, normals);
+		std::clock_t begin = clock();
 
 		std::vector<unsigned short> indices;
 		std::vector<glm::vec3> indexed_vertices;
 		std::vector<glm::vec2> indexed_uvs;
 		std::vector<glm::vec3> indexed_normals;
-		indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
-		vertexbuffer;
-		glGenBuffers(1, &vertexbuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		SuperCoolRead(JoinTwoStrings(filename, ".elo"), indices, indexed_vertices, indexed_uvs, indexed_normals);
+		if (indices.size() == 0) {
+			std::vector< glm::vec3 > vertices;
+			std::vector< glm::vec2 > uvs;
+			std::vector< glm::vec3 > normals;
+			ReadFromFile(JoinTwoStrings(filename, ".obj"), vertices, uvs, normals);
+
+			indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+			SuperCoolWrite(JoinTwoStrings(filename, ".elo"), indices, indexed_vertices, indexed_uvs, indexed_normals);
+		}
+
+		std::clock_t end = clock();
+		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+		this->meshBuffers->vertexbuffer;
+		glGenBuffers(1, &(this->meshBuffers->vertexbuffer));
+		glBindBuffer(GL_ARRAY_BUFFER, this->meshBuffers->vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -82,9 +86,9 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 			(void*)0            // array buffer offset
 		);
 
-		uvbuffer;
-		glGenBuffers(1, &uvbuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		this->meshBuffers->uvbuffer;
+		glGenBuffers(1, &(this->meshBuffers->uvbuffer));
+		glBindBuffer(GL_ARRAY_BUFFER, this->meshBuffers->uvbuffer);
 		glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -97,9 +101,9 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 			(void*)0                          // array buffer offset
 		);
 
-		normalbuffer;
-		glGenBuffers(1, &normalbuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+		this->meshBuffers->normalbuffer;
+		glGenBuffers(1, &(this->meshBuffers->normalbuffer));
+		glBindBuffer(GL_ARRAY_BUFFER, this->meshBuffers->normalbuffer);
 		glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -113,15 +117,15 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 		);
 
 		// Generate a buffer for the indices as well
-		elementbuffer;
-		glGenBuffers(1, &elementbuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+		this->meshBuffers->elementbuffer;
+		glGenBuffers(1, &(this->meshBuffers->elementbuffer));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshBuffers->elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 
 		glBindVertexArray(0);
-		size = indices.size();
+		this->meshBuffers->size = indices.size();
 
-		alreadyLoadedHelper->add(filename,new MeshBuffers(m_VAO,size, vertexbuffer, uvbuffer, normalbuffer, elementbuffer, modelMatrixBuffer));
+		alreadyLoadedHelper->add(filename, this->meshBuffers);
 	}
 }
 
@@ -207,3 +211,63 @@ void meshObject::ReadFromFile(char * filename,
 	}
 	radious = glm::length(max);
 }
+
+void meshObject::SuperCoolRead(const char * path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
+{
+	if(!std::experimental::filesystem::exists(path)) return;
+	std::ifstream ifs(path, std::ios_base::in | std::ios_base::binary);
+	if (ifs)
+	{
+		ifs.unsetf(std::ios::skipws);
+		ifs.seekg(0, std::ios::beg);
+		int size = 0;
+		int i;
+		ifs.read(reinterpret_cast<char*>(&size), sizeof(size));
+		for (i = 0; i < size; i++) {
+			unsigned short temp;
+			ifs.read(reinterpret_cast<char*>(&temp), 1 * sizeof(unsigned short));
+			out_indices.push_back(temp);
+		}
+		ifs.read(reinterpret_cast<char*>(&size), sizeof(size));
+		for (i = 0; i < size; i++) {
+			glm::vec3 temp;
+			ifs.read(reinterpret_cast<char*>(&temp), 1 * sizeof(glm::vec3));
+			out_vertices.push_back(temp);
+		}
+		ifs.read(reinterpret_cast<char*>(&size), sizeof(size));
+		for (i = 0; i < size; i++) {
+			glm::vec2 temp;
+			ifs.read(reinterpret_cast<char*>(&temp), 1 * sizeof(glm::vec2));
+			out_uvs.push_back(temp);
+		}
+		ifs.read(reinterpret_cast<char*>(&size), sizeof(size));
+		for (i = 0; i < size; i++) {
+			glm::vec3 temp;
+			ifs.read(reinterpret_cast<char*>(&temp), 1 * sizeof(glm::vec3));
+			out_normals.push_back(temp);
+		}
+		ifs.close();
+	}
+}
+
+void meshObject::SuperCoolWrite(const char * path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
+{
+	std::ofstream ofs(path, std::ios_base::out | std::ios_base::binary);
+	if (ofs)
+	{
+		int size = out_indices.size();
+		ofs.write(reinterpret_cast<char*>(&size), sizeof(size));
+		ofs.write(reinterpret_cast<char*>(&out_indices[0]), size * sizeof(out_indices[0]));
+		size = out_vertices.size();
+		ofs.write(reinterpret_cast<char*>(&size), sizeof(size));
+		ofs.write(reinterpret_cast<char*>(&out_vertices[0]), size * sizeof(out_vertices[0]));
+		size = out_uvs.size();
+		ofs.write(reinterpret_cast<char*>(&size), sizeof(size));
+		ofs.write(reinterpret_cast<char*>(&out_uvs[0]), size * sizeof(out_uvs[0]));
+		size = out_normals.size();
+		ofs.write(reinterpret_cast<char*>(&size), sizeof(size));
+		ofs.write(reinterpret_cast<char*>(&out_normals[0]), size * sizeof(out_normals[0]));
+		ofs.close();
+	}
+}
+
