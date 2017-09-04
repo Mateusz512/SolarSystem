@@ -48,6 +48,15 @@ class Scene
 
 public:
 
+char* JoinTwoStrings(std::string one, std::string two) {
+	const int len = one.length() + two.length();
+	char* result = new char[len];
+	strcpy(result, one.c_str());
+	strcat(result, two.c_str());
+	return result;
+}
+
+
 Scene(int new_width,int new_height); //  domyslny konstruktor
 ~Scene(); // domyslny destruktor 
 
@@ -56,6 +65,12 @@ void Draw(); // rysuje zawartosc sceny
 void RenderPickingBuffer(); // rysuje bufor z ID obiektów do wybierania obiektu
 
 void RenderShadowMapsCube(); // rysuje kostkê cieni
+
+void Init(); // procedura inicjujaca przetwarzanie
+
+void Animate(); // przeprowadza animacje sceny 
+
+void KeyPressed(unsigned char key, int x, int y); // obsluga klawiatury
 
 void DrawAllObjects(Shader * shader, meshObject* without = NULL); // rysuje wszystkie obiekty
 
@@ -67,11 +82,6 @@ float random(float LO, float HI);
 
 void Resize(int new_width, int new_height); // zmienia rozmiar sceny 
 
-void Init(); // procedura inicjujaca przetwarzanie
-
-void Animate(); // przeprowadza animacje sceny 
-
-void KeyPressed(unsigned char key, int x, int y); // obsluga klawiatury
 
 void Move(glm::vec3 * position, glm::vec3 direction, float radious = 0.0f); // przesuwa obiekt i sprawdza czy nie wyszed³ z pokoju
 
