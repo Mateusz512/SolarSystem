@@ -58,9 +58,10 @@ public:
 	void Load(char* filename, char* diffuseTexture, char* specularTexture, char* normalTexture, char* extraTexture);
 	void ReadFromFile(char * filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
 
-	void SuperCoolRead(const char* path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
-	void SuperCoolWrite(const char* path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
-	
+	void SuperCoolRead(const char * path, std::vector<unsigned short>& out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals, float & radious);
+
+	void SuperCoolWrite(const char * path, std::vector<unsigned short>& out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals, float & radious);
+
 	glm::vec3* position;
 	glm::mat4* rotationMatrix;
 	float scale = 1.0f;

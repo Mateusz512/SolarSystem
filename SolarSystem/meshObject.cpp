@@ -57,7 +57,7 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 		std::vector<glm::vec2> indexed_uvs;
 		std::vector<glm::vec3> indexed_normals;
 
-		SuperCoolRead(JoinTwoStrings(filename, ".elo"), indices, indexed_vertices, indexed_uvs, indexed_normals);
+		SuperCoolRead(JoinTwoStrings(filename, ".elo"), indices, indexed_vertices, indexed_uvs, indexed_normals, radious);
 		if (indices.size() == 0) {
 			std::vector< glm::vec3 > vertices;
 			std::vector< glm::vec2 > uvs;
@@ -65,7 +65,7 @@ void meshObject::Load(char* filename, char* diffuseTexture, char* specularTextur
 			ReadFromFile(JoinTwoStrings(filename, ".obj"), vertices, uvs, normals);
 
 			indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
-			SuperCoolWrite(JoinTwoStrings(filename, ".elo"), indices, indexed_vertices, indexed_uvs, indexed_normals);
+			SuperCoolWrite(JoinTwoStrings(filename, ".elo"), indices, indexed_vertices, indexed_uvs, indexed_normals, radious);
 		}
 
 		std::clock_t end = clock();
@@ -212,7 +212,7 @@ void meshObject::ReadFromFile(char * filename,
 	radious = glm::length(max);
 }
 
-void meshObject::SuperCoolRead(const char * path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
+void meshObject::SuperCoolRead(const char * path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals, float& radious)
 {
 	if(!std::experimental::filesystem::exists(path)) return;
 	std::ifstream ifs(path, std::ios_base::in | std::ios_base::binary);
@@ -246,11 +246,12 @@ void meshObject::SuperCoolRead(const char * path, std::vector<unsigned short> & 
 			ifs.read(reinterpret_cast<char*>(&temp), 1 * sizeof(glm::vec3));
 			out_normals.push_back(temp);
 		}
+		ifs.read(reinterpret_cast<char*>(&radious), sizeof(float));
 		ifs.close();
 	}
 }
 
-void meshObject::SuperCoolWrite(const char * path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
+void meshObject::SuperCoolWrite(const char * path, std::vector<unsigned short> & out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals, float& radious)
 {
 	std::ofstream ofs(path, std::ios_base::out | std::ios_base::binary);
 	if (ofs)
@@ -267,6 +268,7 @@ void meshObject::SuperCoolWrite(const char * path, std::vector<unsigned short> &
 		size = out_normals.size();
 		ofs.write(reinterpret_cast<char*>(&size), sizeof(size));
 		ofs.write(reinterpret_cast<char*>(&out_normals[0]), size * sizeof(out_normals[0]));
+		ofs.write(reinterpret_cast<char*>(&radious), 1 * sizeof(float));
 		ofs.close();
 	}
 }
