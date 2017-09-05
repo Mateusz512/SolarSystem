@@ -1,0 +1,14 @@
+# Blender MTL File: 'projekt.blend'
+# Material Count: 1
+
+newmtl treasure_chest
+Ns 9.803922
+Ka 0.588000 0.588000 0.588000
+Kd 0.500000 0.500000 0.500000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:\Users\Math\Desktop\starotsta\Free Treasure Chest\treasure_chest_obj\treasure_chest.jpg
+map_Ka C:\\Users\\Math\\Desktop\\starotsta\\Free Treasure Chest\\treasure_chest_obj\\treasure_chest.jpg

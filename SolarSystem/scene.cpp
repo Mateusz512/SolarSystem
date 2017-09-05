@@ -22,6 +22,14 @@ void Scene::PrepareObjects()
 	meshObjects.push_back(newMeshObject("ceiling", glm::vec3(0, 0, 0)));	
 	meshObjects.push_back(newMeshObject("chair", glm::vec3(4, 0.38022f, 4)));
 	meshObjects.push_back(newMeshObject("chair1", glm::vec3(4, 0,-4)));
+	meshObjects.push_back(newMeshObject("chest", glm::vec3(3.38,0, -3.4)));
+	meshObjects.push_back(newMeshObject("table", glm::vec3(-3.38, 0, -3.4)));
+	meshObjects.push_back(newMeshObject("umbrella", glm::vec3(3.38, 0, 3.4)));
+	meshObjects.push_back(newMeshObject("chair2", glm::vec3(5, 0, -5)));
+	meshObjects.push_back(newMeshObject("table2", glm::vec3(1, 0, -2)));
+	meshObjects.push_back(newMeshObject("bench", glm::vec3(-1, 0, -2)));
+	meshObjects.push_back(newMeshObject("library", glm::vec3(6, 0, -2)));
+	meshObjects.push_back(newMeshObject("stool", glm::vec3(3, 0, -2)));
 }
 
 void Scene::Draw()
@@ -162,7 +170,7 @@ void Scene::Init()
 {
 	meshObject::alreadyLoadedHelper = new AlreadyLoadedHelper();
 
-	// inicjalizacja moduï¿½u glew
+	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
 
 	// przygotuj programy shaderow

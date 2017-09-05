@@ -1,0 +1,13 @@
+# Blender MTL File: 'projekt.blend'
+# Material Count: 1
+
+newmtl Material_sa_prop_wood_CM.b.001
+Ns 25.490196
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.250000 0.250000 0.250000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Math\Desktop\starotsta\Medieval Style X Chair (LD)\SA_LD_Med_X_Chair_OBJ\sa_prop_wood_CM.bmp
