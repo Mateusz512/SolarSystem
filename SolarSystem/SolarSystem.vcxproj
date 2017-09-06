@@ -152,8 +152,6 @@
     <None Include="shaders\pickingVS.vs" />
     <None Include="shaders\skybox.fs" />
     <None Include="shaders\skybox.vs" />
-    <None Include="shaders\stencilFS.fs" />
-    <None Include="shaders\stencilVS.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,15 +1,10 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;                 
-layout (location = 3) in mat4 instanceModel;            
+layout (location = 0) in vec3 aPos;                       
 
 uniform mat4 model;
 uniform mat4 normalMatrix;
 
 void main()
 {
-    if(gl_InstanceID != 0){		
-		gl_Position = model * instanceModel *  vec4(aPos, 1.0);
-	}else{
-		gl_Position = model * vec4(aPos, 1.0);	
-	}
+	gl_Position = model * vec4(aPos, 1.0);
 }

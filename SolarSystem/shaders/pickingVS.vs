@@ -10,9 +10,5 @@ uniform mat4 normalMatrix;
 
 void main()
 {
-	if(gl_InstanceID != 0){		
-		gl_Position = projection * view * model * instanceModel * vec4(aPos, 1.0);
-	}else{
-		gl_Position = projection * view * model * vec4(aPos, 1.0);	
-	}
+	gl_Position = projection * view * model * vec4(aPos, 1.0);	
 }

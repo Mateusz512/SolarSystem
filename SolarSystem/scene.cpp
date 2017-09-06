@@ -77,17 +77,7 @@ void Scene::Draw()
 	glCullFace(GL_FRONT);
 	RenderShadowMapsCube();
 	glCullFace(GL_BACK);
-
-	glEnable(GL_DEPTH_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilMask(0x00);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	commonShader->use();
 	for (int i = 0; i < pointLightsCount; i++) {
@@ -112,31 +102,8 @@ void Scene::Draw()
 	commonShader->setVec3("viewPos", cameraPosition);
 	commonShader->setFloat("far_plane", far_plane);
 
-	DrawAllObjects(commonShader, selected);
-
-	if (selected) {
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-		DrawObject(commonShader, selected);
-
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		stencilShader->use();
-		stencilShader->setMat4("projection", projection);
-		stencilShader->setMat4("view", view);
-		float tempScale = selected->scale;
-		//glm::vec3 tempPos = glm::vec3(*(selected->position));
-		selected->scale = tempScale * 1.1f;
-		//*(selected->position) += glm::normalize(cameraPosition - tempPos) * 0.3f;
-		glDisable(GL_DEPTH_TEST);
-		//TransformAndDraw(stencilShader, selected);
-		selected->scale = tempScale;
-		//*(selected->position) = tempPos;
-		glStencilMask(0xFF);
-		glEnable(GL_DEPTH_TEST);
-	}
-
-
+	DrawAllObjects(commonShader);
+	
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
 }
 
@@ -179,7 +146,6 @@ void Scene::Init()
 	depthShader = new Shader("shaders\\depthShader.vs", "shaders\\depthShader.fs", "shaders\\depthShader.gs");
 	skyboxShader = new Shader("shaders\\skybox.vs", "shaders\\skybox.fs");
 	pickingShader = new Shader("shaders\\pickingVS.vs", "shaders\\pickingFS.fs");
-	stencilShader = new Shader("shaders\\stencilVS.vs", "shaders\\stencilFS.fs");
 
 	commonShader->setInt("diffuseTexture", Diffuse);
 	commonShader->setInt("isAtmo", 0);

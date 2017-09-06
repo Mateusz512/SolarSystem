@@ -110,11 +110,5 @@
     <None Include="shaders\pickingVS.vs">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\stencilFS.fs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\stencilVS.vs">
-      <Filter>shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

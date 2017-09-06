@@ -128,7 +128,6 @@ Shader* commonShader;
 Shader* depthShader;
 Shader* skyboxShader;
 Shader* pickingShader;
-Shader* stencilShader;
 Skybox* skybox;
 float near_plane = 0.1f;
 float far_plane = 400.0f;
