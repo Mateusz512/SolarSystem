@@ -89,7 +89,6 @@ void Scene::Draw()
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0x00);
 
-	// ustaw macierz projekcji na perspektywiczna
 	commonShader->use();
 	for (int i = 0; i < pointLightsCount; i++) {
 		commonShader->setVec3("pointLights[" + std::to_string(i) + "].position", pointLights[i].position);
@@ -171,7 +170,7 @@ void Scene::Init()
 {
 	meshObject::alreadyLoadedHelper = new AlreadyLoadedHelper();
 
-	// inicjalizacja moduï¿½u glew
+	// inicjalizacja modu³u glew
 	GLenum err = glewInit();
 
 	// przygotuj programy shaderow
@@ -216,11 +215,11 @@ void Scene::Init()
 
 	srand(static_cast <unsigned> (time(0)));
 	for (int i = 0; i < pointLightsCount; i++) {
-		pointLights[i].position = glm::rotate(glm::vec3(3, 5, 0), 36.0f * i, glm::vec3(0, 1, 0));
+		pointLights[i].position = glm::rotate(glm::vec3(6, 1.8, 0), 360.0f / (float)pointLightsCount * i, glm::vec3(0, 1, 0));
 		pointLights[i].ambient = glm::vec3(
 			random(0.01f,0.05f), random(0.01f, 0.05f), random(0.01f, 0.05f)); 
 		pointLights[i].diffuse = glm::vec3(
-			random(0.1f, 0.8f), random(0.01f, 0.8f), random(0.01f, 0.8f)); 
+			random(0.5f, 0.8f), random(0.5f, 0.8f), random(0.5f, 0.8f)); 
 		pointLights[i].specular = glm::vec3(
 			random(0.5f, 1.0f), random(0.5f, 1.0f), random(0.5f, 1.0f));
 		pointLights[i].constant=1.0f;
@@ -234,7 +233,9 @@ void Scene::Init()
 // przeprowadza animacje sceny 
 void Scene::Animate()
 {
-
+	for (int i = 0; i < pointLightsCount; i++) {
+		pointLights[i].position = glm::rotate(pointLights[i].position, 0.6f, glm::vec3(0, 1, 0));
+	}
 }
 //--------------------------------------------------------------------------------------------
 // kontrola naciskania klawiszy klawiatury
@@ -279,7 +280,7 @@ void Scene::KeyPressed(unsigned char key, int x, int y)
 		case 37: { Move(&cameraPosition, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * -movementSensitivity); break; } //LEFT
 		case 39: { Move(&cameraPosition, glm::normalize(glm::cross(cameraDirection, glm::vec3(0, 1, 0))) * glm::vec3(1, 0, 1) * movementSensitivity); break; } //RIGHT
 
-		case 32: { break; }
+		case 32: { useShadows = !useShadows; break; }
 	}
 
 }
@@ -380,7 +381,7 @@ void Scene::DrawObject(Shader* shader, meshObject* toDraw) {
 	shader->setInt("EnableSpecularTexture", 0);
 	shader->setInt("EnableNormalTexture", 0);
 	shader->setInt("EnableExtraTexture", 0);
-	shader->setInt("shadows", 1);
+	shader->setInt("shadows", useShadows);
 	for (int i = Diffuse; i <= Extra; i++) {
 		GLuint textureID = toDraw->getTextureID(i);
 		if (textureID == UINT_MAX){
