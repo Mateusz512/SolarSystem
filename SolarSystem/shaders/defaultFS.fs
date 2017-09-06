@@ -108,42 +108,46 @@ float ShadowCalculation(vec3 fragPos)
 
 void main()
 {   
-	vec3 color;
-	vec4 randomness = vec4(0);
-	//FragColor=vec4(color,1);
-    vec3 lightDir = normalize(lightPos - fs_in.FragPos);
-    vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    vec3 normal = normalize(fs_in.Normal);
-	color = texture(diffuseTexture, fs_in.TexCoords * vec2(1.0, -1.0) ).rgb;	
-	for(int i = 0; i < NR_POINT_LIGHTS; i++){
-		randomness += vec4(CalcPointLight(pointLights[i], normal, fs_in.FragPos, viewDir),1.0);    	
-	}
-    vec3 lightColor = vec3(0.4);
-    vec3 ambient = 0.5 * color; 
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * lightColor;
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = 0.0;
-	vec3 specular;
-	vec3 halfwayDir = normalize(lightDir + viewDir);  
-	spec = pow(max(dot(normal, halfwayDir), 0.0), 128.0);
-	if( EnableSpecularTexture == 1 ){
-		specular = 3 *  spec * vec3(texture(specularTexture, fs_in.TexCoords * vec2(1.0, -1.0)));
+	if( EnableDiffuseTexture == 1){
+		vec3 color;
+		vec4 randomness = vec4(0);
+		//FragColor=vec4(color,1);
+		vec3 lightDir = normalize(lightPos - fs_in.FragPos);
+		vec3 viewDir = normalize(viewPos - fs_in.FragPos);
+		vec3 normal = normalize(fs_in.Normal);
+		color = texture(diffuseTexture, fs_in.TexCoords * vec2(1.0, -1.0) ).rgb;	
+		for(int i = 0; i < NR_POINT_LIGHTS; i++){
+			randomness += vec4(CalcPointLight(pointLights[i], normal, fs_in.FragPos, viewDir),1.0);    	
+		}
+		vec3 lightColor = vec3(0.4);
+		vec3 ambient = 0.5 * color; 
+		float diff = max(dot(lightDir, normal), 0.0);
+		vec3 diffuse = diff * lightColor;
+		vec3 reflectDir = reflect(-lightDir, normal);
+		float spec = 0.0;
+		vec3 specular;
+		vec3 halfwayDir = normalize(lightDir + viewDir);  
+		spec = pow(max(dot(normal, halfwayDir), 0.0), 128.0);
+		if( EnableSpecularTexture == 1 ){
+			specular = 3 *  spec * vec3(texture(specularTexture, fs_in.TexCoords * vec2(1.0, -1.0)));
+		}else{
+			specular = spec * lightColor;
+		}
+		float shadow;
+		vec4 result;
+		if(shadows == 1){
+			float shadow = ShadowCalculation(fs_in.FragPos); 	
+			vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
+			result = vec4(lighting, 0.5f);
+		}else if(shadows == -1){
+			result = vec4(color, 1);
+		}else{
+			//vec3 lighting = (ambient + (diffuse + specular)) * color;  	
+			result = vec4(ambient, 0.2f);
+		}
+		result+=randomness;
+		FragColor = vec4(result.xyz,1);	
 	}else{
-		specular = spec * lightColor;
+		FragColor = vec4(0.7,0.7,0,0.5);
 	}
-	float shadow;
-	vec4 result;
-	if(shadows == 1){
-		float shadow = ShadowCalculation(fs_in.FragPos); 	
-		vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
-		result = vec4(lighting, 0.5f);
-	}else if(shadows == -1){
-		result = vec4(color, 1);
-	}else{
-		//vec3 lighting = (ambient + (diffuse + specular)) * color;  	
-		result = vec4(ambient, 0.2f);
-	}
-	result+=randomness;
-	FragColor = vec4(result.xyz,1);
 }

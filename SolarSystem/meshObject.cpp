@@ -160,6 +160,12 @@ void meshObject::ReadFromFile(char * filename,
 		if (strcmp(lineHeader, "v") == 0) {
 			glm::vec3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
+			cur.x = vertex.x;
+			cur.y = vertex.z;
+			if (glm::length(max) < glm::length(cur)) {
+				max.x = cur.x;
+				max.y = cur.y;
+			}
 			temp_vertices.push_back(vertex);
 		}
 		else if (strcmp(lineHeader, "vt") == 0) {
@@ -182,12 +188,6 @@ void meshObject::ReadFromFile(char * filename,
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
-			cur.x = vertexIndex[0];
-			cur.y = vertexIndex[2];
-			if (glm::length(max) > glm::length(cur)) {
-				max.x = cur.x;
-				max.y = cur.y;
-			}
 			uvIndices.push_back(uvIndex[0]);
 			uvIndices.push_back(uvIndex[1]);
 			uvIndices.push_back(uvIndex[2]);

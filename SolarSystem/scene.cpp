@@ -20,17 +20,18 @@ void Scene::PrepareObjects()
 	meshObjects.push_back(newMeshObject("floor", glm::vec3(0, 0, 0)));
 	meshObjects.push_back(newMeshObject("wall", glm::vec3(0, 0, 0)));
 	meshObjects.push_back(newMeshObject("ceiling", glm::vec3(0, 0, 0)));	
-	meshObjects.push_back(newMeshObject("chair", glm::vec3(4, 0.38022f, 4)));
+	meshObjects.push_back(newMeshObject("chair", glm::vec3(-4, 0.38022f, 4)));
 	meshObjects.push_back(newMeshObject("chair1", glm::vec3(4, 0,-4)));
 	meshObjects.push_back(newMeshObject("chest", glm::vec3(3.38,0, -3.4)));
 	meshObjects.push_back(newMeshObject("table", glm::vec3(-3.38, 0, -3.4)));
-	meshObjects.push_back(newMeshObject("umbrella", glm::vec3(3.38, 0, 3.4)));
+	meshObjects.push_back(newMeshObject("umbrella", glm::vec3(-3.38, 0, 3.4)));
 	meshObjects.push_back(newMeshObject("chair2", glm::vec3(5, 0, -5)));
 	meshObjects.push_back(newMeshObject("table2", glm::vec3(1, 0, -2)));
 	meshObjects.push_back(newMeshObject("bench", glm::vec3(-1, 0, -2)));
 	meshObjects.push_back(newMeshObject("library", glm::vec3(6, 0, -2)));
-	meshObjects.push_back(newMeshObject("stool", glm::vec3(3, 0, -2)));
-	meshObjects.push_back(newMeshObject("chair3", glm::vec3(1, 0, -2)));
+	meshObjects.push_back(newMeshObject("stool", glm::vec3(3, 0, 5)));
+	meshObjects.push_back(newMeshObject("chair3", glm::vec3(1, 0, 6)));
+	cylinder = newMeshObject("cylinder", glm::vec3(0, 0, 0));
 }
 
 void Scene::Draw()
@@ -104,6 +105,16 @@ void Scene::Draw()
 
 	DrawAllObjects(commonShader);
 	
+	if (selected) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquation(GL_FUNC_ADD);
+		cylinder->position = selected->position;
+		cylinder->scale = selected->radious;
+		DrawObject(commonShader, cylinder);
+		glDisable(GL_BLEND);
+	}
+
 	skybox->Draw(projection, glm::mat4(glm::mat3(view)));
 }
 
@@ -339,7 +350,7 @@ void Scene::DrawObject(Shader* shader, meshObject* toDraw) {
 	mTransform = glm::translate(mTransform, (glm::vec3)(*toDraw->position));
 	mTransform = mTransform * (*toDraw->rotationMatrix);
 	if (toDraw->scale != 1.0f && toDraw->scale>0)
-		mTransform = glm::scale(mTransform, toDraw->scale, toDraw->scale, toDraw->scale);
+		mTransform = glm::scale(mTransform, toDraw->scale, 1.0f, toDraw->scale);
 	shader->use();
 	shader->setMat4("normalMatrix", glm::transpose(glm::inverse(mTransform)));
 	shader->setMat4("model", mTransform);
