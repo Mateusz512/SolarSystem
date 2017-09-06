@@ -30,6 +30,7 @@ void Scene::PrepareObjects()
 	meshObjects.push_back(newMeshObject("bench", glm::vec3(-1, 0, -2)));
 	meshObjects.push_back(newMeshObject("library", glm::vec3(6, 0, -2)));
 	meshObjects.push_back(newMeshObject("stool", glm::vec3(3, 0, -2)));
+	meshObjects.push_back(newMeshObject("chair3", glm::vec3(1, 0, -2)));
 }
 
 void Scene::Draw()
@@ -170,7 +171,7 @@ void Scene::Init()
 {
 	meshObject::alreadyLoadedHelper = new AlreadyLoadedHelper();
 
-	// inicjalizacja modu³u glew
+	// inicjalizacja moduï¿½u glew
 	GLenum err = glewInit();
 
 	// przygotuj programy shaderow
