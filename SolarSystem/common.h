@@ -3,7 +3,7 @@
 #define _common_h
 #define IS_WIN32 1
 #pragma once
-#define PROJECT_NAME "Solar System"
+#define PROJECT_NAME "Furniture"
 
 #define INITIAL_WIDTH 1280
 
